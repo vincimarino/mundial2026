@@ -1,0 +1,4217 @@
+<!DOCTYPE html>
+<!-- saved from url=(0061)file:///C:/Users/santi/Downloads/mundial2026-argentina_1.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mundial FIFA 2026 — Dashboard Argentina</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500;600&display=swap');
+  :root {
+    --gold:#FFD700;--gold-dim:#C9A227;--gold-dark:#8B6914;
+    --bg-deep:#080C14;--bg-card:#0E1525;--bg-card2:#111827;
+    --border:rgba(255,215,0,0.18);--border-bright:rgba(255,215,0,0.5);
+    --text:#E8EAF0;--text-muted:#7A8499;--text-dim:#4A5568;
+    --arg-celeste:#74C0FC;--arg-celeste-dark:#1971C2;--arg-glow:rgba(116,192,252,0.18);
+    --esp-red:#C60B1E;--green-ok:#22C55E;--red-live:#EF4444;
+    --radius:14px;--radius-sm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-deep);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;min-height:100vh;
+    background-image:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(255,215,0,0.04) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 30% at 80% 90%,rgba(116,192,252,0.05) 0%,transparent 60%);}
+
+  /* HEADER */
+  .site-header{background:linear-gradient(180deg,#060A12 0%,var(--bg-deep) 100%);border-bottom:1px solid var(--border);
+    padding:14px 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .site-title{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;
+    background:linear-gradient(90deg,var(--gold) 0%,#FFF0A0 50%,var(--gold) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+  .header-meta{font-size:0.72rem;color:var(--text-muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;}
+  .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .live-clock{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);letter-spacing:2px;}
+  .btn{border:none;padding:8px 16px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+    font-size:0.82rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+  .btn-gold{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#000;}
+  .btn-gold:hover{transform:scale(1.05);box-shadow:0 0 14px rgba(255,215,0,0.5);}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted);}
+  .btn-outline:hover{border-color:var(--gold-dim);color:var(--gold-dim);}
+  .api-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:10px;
+    font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;letter-spacing:1px;}
+  .api-live{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:#86efac;}
+  .api-static{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;}
+  .api-loading{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);color:var(--gold-dim);}
+
+  /* ALERT */
+  .alert-banner{background:linear-gradient(90deg,rgba(239,68,68,0.92),rgba(185,28,28,0.92));
+    border-bottom:2px solid #EF4444;padding:12px 20px;display:none;align-items:center;gap:10px;}
+  .alert-banner.show{display:flex;animation:pulseBanner 2s infinite;}
+  @keyframes pulseBanner{0%,100%{opacity:1}50%{opacity:0.82}}
+  .alert-text{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;}
+
+  /* LOADING */
+  .loading-overlay{position:fixed;inset:0;background:rgba(8,12,20,0.93);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;z-index:999;gap:20px;}
+  .loading-overlay.hidden{display:none;}
+  .spinner{width:56px;height:56px;border-radius:50%;border:4px solid rgba(255,215,0,0.15);border-top-color:var(--gold);animation:spin 0.9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--gold);}
+  .loading-sub{font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;color:var(--text-muted);letter-spacing:1px;}
+
+  /* CONTAINER */
+  .container{max-width:1400px;margin:0 auto;padding:20px;}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:2px;color:var(--gold);
+    border-bottom:2px solid var(--border-bright);padding-bottom:8px;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+
+  /* ARGENTINA HERO */
+  .arg-hero{background:linear-gradient(135deg,#0A1A2E 0%,#0D2044 50%,#0A1A2E 100%);
+    border:2px solid var(--arg-celeste-dark);border-radius:var(--radius);padding:22px;
+    position:relative;overflow:hidden;margin-bottom:20px;
+    box-shadow:0 0 40px var(--arg-glow),inset 0 0 40px rgba(116,192,252,0.03);}
+  .arg-hero::before{content:'★';position:absolute;font-size:13rem;color:rgba(116,192,252,0.03);
+    top:-20px;right:-10px;pointer-events:none;font-family:'Bebas Neue',sans-serif;}
+  .arg-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+  .arg-flag{font-size:3.5rem;filter:drop-shadow(0 0 8px rgba(116,192,252,0.5));}
+  .arg-name{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;color:var(--arg-celeste);line-height:1;}
+  .arg-sub{font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-top:3px;}
+  .arg-badge{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#000;padding:6px 12px;
+    border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:1px;text-align:center;line-height:1.4;margin-left:auto;}
+  .arg-stats{display:grid;grid-template-columns:repeat(9,1fr);gap:8px;margin-bottom:16px;}
+  @media(max-width:700px){.arg-stats{grid-template-columns:repeat(3,1fr);}}
+  .stat-box{background:rgba(116,192,252,0.07);border:1px solid rgba(116,192,252,0.2);border-radius:var(--radius-sm);padding:10px 6px;text-align:center;}
+  .stat-box .val{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--arg-celeste);line-height:1;}
+  .stat-box .lbl{font-size:0.64rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-family:'Barlow Condensed',sans-serif;margin-top:3px;}
+
+  .next-match-card{background:rgba(116,192,252,0.06);border:1px solid rgba(116,192,252,0.25);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;}
+  .next-match-label{font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--arg-celeste);margin-bottom:8px;}
+  .match-teams-hero{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .match-team-big{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;}
+  .match-vs{font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;color:var(--text-muted);}
+  .match-info-row{display:flex;gap:14px;flex-wrap:wrap;font-size:0.8rem;color:var(--text-muted);}
+  .match-info-row strong{color:var(--text);}
+
+  .countdown-box{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:var(--radius-sm);
+    padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .countdown-label{font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dim);}
+  .countdown-digits{display:flex;gap:6px;align-items:center;}
+  .cd-unit{text-align:center;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);border-radius:5px;padding:6px 10px;min-width:52px;}
+  .cd-num{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);line-height:1;}
+  .cd-lbl{font-family:'Barlow Condensed',sans-serif;font-size:0.6rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
+  .cd-sep{font-size:1.2rem;color:var(--gold-dim);font-family:'Bebas Neue',sans-serif;}
+
+  .results-list{display:flex;flex-direction:column;gap:7px;margin-top:12px;}
+  .result-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(0,0,0,0.2);border-radius:var(--radius-sm);border-left:3px solid transparent;font-size:0.85rem;flex-wrap:wrap;}
+  .result-item.win{border-left-color:var(--green-ok);}
+  .result-item.draw{border-left-color:var(--gold-dim);}
+  .result-item.loss{border-left-color:var(--red-live);}
+  .result-item.pending{border-left-color:var(--text-dim);opacity:0.75;}
+  .res-phase{font-family:'Barlow Condensed',sans-serif;font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);min-width:90px;}
+  .res-teams{flex:1;}
+  .res-score{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:1px;color:var(--gold);}
+  .badge-pending{font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;background:rgba(116,192,252,0.15);color:var(--arg-celeste);padding:2px 7px;border-radius:4px;letter-spacing:1px;}
+  .badge-live{font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;background:rgba(239,68,68,0.2);color:#fca5a5;padding:2px 7px;border-radius:4px;animation:pulseBanner 1.5s infinite;}
+
+  .route-path{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;}
+  .route-step{background:rgba(116,192,252,0.08);border:1px solid rgba(116,192,252,0.2);border-radius:6px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;color:var(--arg-celeste);line-height:1.4;}
+  .route-arrow{color:var(--gold-dim);}
+  .nota{font-size:0.72rem;color:var(--text-muted);font-style:italic;margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:2px solid var(--border);}
+
+  /* CARD */
+  .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:18px;}
+
+  /* TABS */
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+  .tab-btn{background:var(--bg-card2);border:1px solid var(--border);color:var(--text-muted);padding:8px 18px;border-radius:6px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;}
+  .tab-btn:hover{border-color:var(--gold-dim);color:var(--gold-dim);}
+  .tab-btn.active{background:rgba(255,215,0,0.12);border-color:var(--gold);color:var(--gold);}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  /* MATCH LIST */
+  .match-list{display:flex;flex-direction:column;gap:9px;}
+  .date-sep{display:flex;align-items:center;gap:10px;padding:10px 0 4px;}
+  .date-sep-text{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--text-muted);white-space:nowrap;}
+  .date-sep-line{flex:1;height:1px;background:var(--border);}
+  .match-row{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-sm);
+    padding:12px 14px;display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center;
+    transition:border-color 0.2s;position:relative;}
+  .match-row:hover{border-color:rgba(255,215,0,0.3);}
+  .match-row.arg-match{border-color:var(--arg-celeste-dark);background:linear-gradient(135deg,#081828 0%,#0D2044 100%);box-shadow:0 0 16px rgba(116,192,252,0.08);}
+  .match-row.arg-match::before{content:'🇦🇷';position:absolute;left:-5px;top:50%;transform:translateY(-50%) scale(0.8);}
+  .match-row.esp-match{border-color:var(--esp-red);background:linear-gradient(135deg,#1A0505 0%,#260808 100%);}
+  .match-datetime{display:flex;flex-direction:column;gap:2px;}
+  .match-date{font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;color:var(--gold-dim);letter-spacing:0.5px;text-transform:uppercase;}
+  .match-time-madrid{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;color:var(--gold);letter-spacing:1px;line-height:1;}
+  .match-time-local{font-size:0.66rem;color:var(--text-muted);font-family:'Barlow Condensed',sans-serif;}
+  .match-body{min-width:0;}
+  .match-teams-row{display:flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:600;flex-wrap:wrap;}
+  .match-score-inline{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);background:rgba(255,215,0,0.1);padding:1px 8px;border-radius:4px;letter-spacing:1px;}
+  .match-meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:4px;font-size:0.7rem;color:var(--text-muted);font-family:'Barlow Condensed',sans-serif;}
+  .tag{background:rgba(255,255,255,0.04);padding:1px 6px;border-radius:3px;border:1px solid rgba(255,255,255,0.07);}
+  .tag.tv{color:var(--gold-dim);border-color:rgba(255,215,0,0.15);}
+  .match-status{text-align:right;white-space:nowrap;}
+  .status-badge{display:inline-block;padding:4px 10px;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+  .status-live{background:var(--red-live);animation:pulseBanner 1.2s infinite;}
+  .status-played{background:rgba(34,197,94,0.18);color:var(--green-ok);border:1px solid var(--green-ok);}
+  .status-upcoming{background:rgba(255,215,0,0.08);color:var(--gold-dim);border:1px solid rgba(255,215,0,0.25);}
+  .match-phase-tag{display:block;font-size:0.62rem;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+  .pill{display:inline-block;padding:1px 7px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;margin-left:3px;}
+  .pill-blue{background:rgba(116,192,252,0.15);color:var(--arg-celeste);}
+  .pill-red{background:rgba(198,11,30,0.2);color:#ff8080;}
+  @media(max-width:680px){.match-row{grid-template-columns:88px 1fr;}.match-status{display:none;}}
+
+  /* GROUPS */
+  .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:14px;}
+  .group-card{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+  .group-card.arg-group{border-color:var(--arg-celeste-dark);box-shadow:0 0 16px rgba(116,192,252,0.08);}
+  .group-card.esp-group{border-color:rgba(198,11,30,0.5);}
+  .group-header{background:rgba(255,215,0,0.06);border-bottom:1px solid var(--border);padding:8px 12px;
+    font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--gold);
+    display:flex;align-items:center;justify-content:space-between;}
+  .group-card.arg-group .group-header{background:rgba(116,192,252,0.09);color:var(--arg-celeste);}
+  .group-table{width:100%;border-collapse:collapse;}
+  .group-table th{font-family:'Barlow Condensed',sans-serif;font-size:0.64rem;letter-spacing:1px;text-transform:uppercase;
+    color:var(--text-dim);padding:5px 7px;text-align:center;border-bottom:1px solid var(--border);}
+  .group-table th:nth-child(2){text-align:left;}
+  .group-table td{padding:7px 7px;font-size:0.81rem;text-align:center;border-bottom:1px solid rgba(255,255,255,0.04);}
+  .group-table td.team-name{text-align:left;font-weight:500;}
+  .group-table td.pts{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gold);}
+  .group-table tr:last-child td{border-bottom:none;}
+  .group-table tr.qualified td{background:rgba(34,197,94,0.04);}
+  .group-table tr.qualified td.team-name::before{content:'●';color:var(--green-ok);margin-right:5px;font-size:0.5rem;vertical-align:middle;}
+  .group-table tr.eliminated td{opacity:0.4;}
+  .group-table tr.arg-row td{background:rgba(116,192,252,0.05);}
+  .group-table tr.esp-row td{background:rgba(198,11,30,0.04);}
+
+  /* BRACKET */
+  .bracket-scroll{overflow-x:auto;padding-bottom:8px;}
+  .bracket{display:flex;min-width:920px;}
+  .bracket-round{display:flex;flex-direction:column;flex:1;min-width:155px;}
+  .bracket-round-title{font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--gold);
+    text-align:center;padding:6px 8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+  .bracket-matches{display:flex;flex-direction:column;gap:8px;align-items:center;}
+  .bracket-match{background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;width:144px;overflow:hidden;font-size:0.77rem;}
+  .bracket-match.arg-path{border-color:var(--arg-celeste-dark);box-shadow:0 0 10px rgba(116,192,252,0.12);}
+  .bracket-match.final-match{border-color:var(--gold);box-shadow:0 0 14px rgba(255,215,0,0.2);}
+  .bracket-team{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;
+    font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .bracket-team:last-child{border-bottom:none;}
+  .bracket-team.winner{background:rgba(255,215,0,0.08);color:var(--gold);font-weight:700;}
+  .bracket-team.tbd{color:var(--text-dim);font-style:italic;font-size:0.7rem;}
+  .bracket-team.arg-team{background:rgba(116,192,252,0.1);color:var(--arg-celeste);font-weight:700;}
+
+  /* FOOTER */
+  .site-footer{border-top:1px solid var(--border);padding:20px;text-align:center;color:var(--text-dim);
+    font-size:0.72rem;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;line-height:1.9;margin-top:30px;}
+  .site-footer a{color:var(--gold-dim);text-decoration:none;}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:var(--bg-deep);}
+  ::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Cargando datos en vivo</div>
+  <div class="loading-sub" id="loadingSub">Conectando con football-data.org...</div>
+</div>
+
+<div class="alert-banner" id="alertBanner">
+  <span style="font-size:1.2rem">🚨</span>
+  <span class="alert-text" id="alertText">¡Partido de Argentina en menos de 24 horas!</span>
+</div>
+
+<header class="site-header">
+  <div>
+    <div class="site-title">⚽ Mundial FIFA 2026 — Dashboard Argentina</div>
+    <div class="header-meta">
+      Actualizado: <span id="lastUpdate">07 jun, 17:14 CEST</span> &nbsp;·&nbsp;
+      <span id="apiBadge" class="api-badge api-static">⬤ Datos estáticos</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="live-clock" id="clockMadrid">17:14:52 CEST</span>
+    <button class="btn btn-outline" onclick="loadData(true)">↻ Actualizar</button>
+    <button class="btn btn-gold" onclick="location.reload()">⟳ Recargar</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ARGENTINA HERO -->
+  <div class="arg-hero">
+    <div class="arg-header">
+      <div class="arg-flag">🇦🇷</div>
+      <div>
+        <div class="arg-name">Selección Argentina</div>
+        <div class="arg-sub">Campeona Defensora · Grupo J · FIFA World Cup 2026</div>
+      </div>
+      <div class="arg-badge">🏆 Campeona<br>Qatar 2022</div>
+    </div>
+    <div class="arg-stats">
+      <div class="stat-box"><div class="val" id="s-pos">1º</div><div class="lbl">Posición</div></div>
+      <div class="stat-box"><div class="val" id="s-pj">0</div><div class="lbl">Jugados</div></div>
+      <div class="stat-box"><div class="val" id="s-g">0</div><div class="lbl">Victorias</div></div>
+      <div class="stat-box"><div class="val" id="s-e">0</div><div class="lbl">Empates</div></div>
+      <div class="stat-box"><div class="val" id="s-p">0</div><div class="lbl">Derrotas</div></div>
+      <div class="stat-box"><div class="val" id="s-gf">0</div><div class="lbl">GF</div></div>
+      <div class="stat-box"><div class="val" id="s-gc">0</div><div class="lbl">GC</div></div>
+      <div class="stat-box"><div class="val" id="s-dg">+0</div><div class="lbl">DG</div></div>
+      <div class="stat-box"><div class="val" id="s-pts">0</div><div class="lbl">Puntos</div></div>
+    </div>
+    <div class="next-match-card">
+      <div class="next-match-label">⚡ Próximo Partido de Argentina</div>
+      <div id="nextMatchContent">
+      <div class="match-teams-hero">
+        <div class="match-team-big">🇦🇷 Argentina</div>
+        <div class="match-vs">VS</div>
+        <div class="match-team-big">🇩🇿 Algeria</div>
+      </div>
+      <div class="match-info-row">
+        <span>📅 <strong>mié, 17 jun</strong></span>
+        <span>🕑 <strong>03:00 CEST</strong> (21:00 CDT)</span>
+        <span>🏟️ <strong>Arrowhead Stadium</strong></span>
+        <span>📺 <strong>DAZN / La 1 (RTVE)</strong></span>
+      </div></div>
+    </div>
+    <div class="countdown-box">
+      <div class="countdown-label">⏳ Cuenta regresiva</div>
+      <div class="countdown-digits">
+        <div class="cd-unit"><div class="cd-num" id="cd-d">09</div><div class="cd-lbl">días</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><div class="cd-num" id="cd-h">09</div><div class="cd-lbl">horas</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><div class="cd-num" id="cd-m">45</div><div class="cd-lbl">min</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-unit"><div class="cd-num" id="cd-s">07</div><div class="cd-lbl">seg</div></div>
+      </div>
+      <div id="cdLabel" style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:0.78rem;color:var(--text-muted)">hasta Argentina vs Algeria</div>
+    </div>
+    <div style="margin-top:16px">
+      <div style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--arg-celeste);margin-bottom:8px">📋 Historial en el Torneo</div>
+      <div class="results-list" id="argHistory"><div class="result-item pending">
+      <span class="res-phase">Grupo J</span>
+      <span class="res-teams">🇦🇷 Argentina vs 🇩🇿 Algeria</span>
+      <span class="badge-pending">⏳ mié, 17 jun 03:00</span>
+    </div><div class="result-item pending">
+      <span class="res-phase">Grupo J</span>
+      <span class="res-teams">🇦🇷 Argentina vs 🇦🇹 Austria</span>
+      <span class="badge-pending">⏳ lun, 22 jun 19:00</span>
+    </div><div class="result-item pending">
+      <span class="res-phase">Grupo J</span>
+      <span class="res-teams">🇦🇷 Argentina vs 🇯🇴 Jordan</span>
+      <span class="badge-pending">⏳ dom, 28 jun 21:00</span>
+    </div><div class="result-item pending">
+      <span class="res-phase">1/16 Final</span>
+      <span class="res-teams">🏳️ 1º Grupo H vs 🏳️ Argentina (si 2ª J)</span>
+      <span class="badge-pending">⏳ jue, 02 jul 21:00</span>
+    </div><div class="result-item pending">
+      <span class="res-phase">1/16 Final</span>
+      <span class="res-teams">🏳️ Argentina (si 1ª J) vs 🏳️ 2º Grupo H</span>
+      <span class="badge-pending">⏳ vie, 03 jul 22:00</span>
+    </div><div class="result-item pending">
+      <span class="res-phase">Octavos de Final</span>
+      <span class="res-teams">🏳️ G. M5 Octavos vs 🏳️ G. M6 Octavos</span>
+      <span class="badge-pending">⏳ lun, 06 jul 19:00</span>
+    </div></div>
+    </div>
+    <div style="margin-top:16px">
+      <div style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--arg-celeste);margin-bottom:6px">🗺️ Ruta Potencial hasta la Final</div>
+      <div class="route-path">
+        <div class="route-step">Grupo J<br><small style="color:var(--text-muted)">vs Argelia/Austria/Jordania</small></div>
+        <span class="route-arrow">→</span>
+        <div class="route-step">1/16<br><small style="color:var(--text-muted)">2º Grupo H</small></div>
+        <span class="route-arrow">→</span>
+        <div class="route-step">Octavos<br><small style="color:var(--text-muted)">Por definir</small></div>
+        <span class="route-arrow">→</span>
+        <div class="route-step">Cuartos<br><small style="color:var(--text-muted)">Por definir</small></div>
+        <span class="route-arrow">→</span>
+        <div class="route-step">Semis<br><small style="color:var(--text-muted)">Por definir</small></div>
+        <span class="route-arrow">→</span>
+        <div class="route-step" style="border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,0.07)">🏆 FINAL<br><small style="color:var(--gold-dim)">19 Jul · MetLife NJ</small></div>
+      </div>
+      <div class="nota">Si ARG 1ª en Grupo J → 1/16 vs 2º Grupo H (España/Uruguay/Arabia Saudita/Cabo Verde) — 3 Jul, Hard Rock Stadium Miami. Si ARG 2ª → vs 1º Grupo H — 2 Jul, SoFi Stadium Los Ángeles.</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(&#39;calendario&#39;,this)">📅 Calendario</button>
+    <button class="tab-btn" onclick="switchTab(&#39;grupos&#39;,this)">📊 Grupos</button>
+    <button class="tab-btn" onclick="switchTab(&#39;bracket&#39;,this)">🏆 Eliminatorias</button>
+  </div>
+
+  <div class="tab-content active" id="tab-calendario">
+    <div class="card">
+      <div class="section-title">📅 Calendario Completo — 104 Partidos</div>
+      <div style="margin-bottom:10px;font-size:0.77rem;color:var(--text-muted)">
+        <span style="margin-right:12px"><span style="color:var(--arg-celeste)">■</span> Argentina &nbsp;<span style="color:var(--esp-red)">■</span> España</span>
+        <span style="color:var(--text-dim)">· Horarios Madrid CEST (UTC+2) · Hora local del estadio entre paréntesis</span>
+      </div>
+      <div class="match-list" id="matchList"><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">JUE, 11 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 11 jun</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇲🇽 Mexico</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇿🇦 South Africa</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Azteca</span>
+          <span class="tag">Grupo A</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">VIE, 12 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 12 jun</div>
+        <div class="match-time-madrid">02:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇰🇷 South Korea</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇿 Czechia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Akron</span>
+          <span class="tag">Grupo A</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 12 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇦 Canada</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇧🇦 Bosnia-Herzegovina</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ BMO Field</span>
+          <span class="tag">Grupo B</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">SÁB, 13 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 13 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇶🇦 Qatar</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇭 Switzerland</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Levi's Stadium</span>
+          <span class="tag">Grupo B</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 13 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇧🇷 Brazil</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇲🇦 Morocco</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Grupo C</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">DOM, 14 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 14 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇭🇹 Haiti</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Grupo C</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 14 jun</div>
+        <div class="match-time-madrid">20:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(14:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇪🇬 Egypt</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇮🇷 Iran</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Hard Rock Stadium</span>
+          <span class="tag">Grupo G</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 14 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇦🇺 Australia</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇹🇷 Türkiye</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lumen Field</span>
+          <span class="tag">Grupo D</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">LUN, 15 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 15 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇺🇸 United States</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇵🇾 Paraguay</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ SoFi Stadium</span>
+          <span class="tag">Grupo D</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 15 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇧🇪 Belgium</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇳🇿 New Zealand</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ SoFi Stadium</span>
+          <span class="tag">Grupo G</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 15 jun</div>
+        <div class="match-time-madrid">18:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(12:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇩🇪 Germany</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇮 Ivory Coast</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Grupo E</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  esp-match">
+      <div class="match-datetime">
+        <div class="match-date">lun, 15 jun</div>
+        <div class="match-time-madrid">18:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(12:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇪🇸 Spain</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇻 Cape Verde</span>
+          
+          <span class="pill pill-red">ESP</span>
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Mercedes-Benz Stadium</span>
+          <span class="tag">Grupo H</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 15 jun</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇺🇾 Uruguay</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇸🇦 Saudi Arabia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Hard Rock Stadium</span>
+          <span class="tag">Grupo H</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">MAR, 16 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 16 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇪🇨 Ecuador</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇼 Curaçao</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Grupo E</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 16 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇯🇵 Japan</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇹🇳 Tunisia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Grupo F</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 16 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇳🇱 Netherlands</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇺🇦 Ukraine</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lincoln Financial Field</span>
+          <span class="tag">Grupo F</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 16 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇮🇶 Iraq</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇳🇴 Norway</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Grupo I</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">MIÉ, 17 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 17 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇫🇷 France</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇸🇳 Senegal</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Grupo I</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row arg-match ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 17 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇦🇷 Argentina</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇩🇿 Algeria</span>
+          <span class="pill pill-blue">ARG</span>
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Arrowhead Stadium</span>
+          <span class="tag">Grupo J</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 17 jun</div>
+        <div class="match-time-madrid">06:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(00:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇦🇹 Austria</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇯🇴 Jordan</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Levi's Stadium</span>
+          <span class="tag">Grupo J</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 17 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇵🇹 Portugal</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇩 DR Congo</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ NRG Stadium</span>
+          <span class="tag">Grupo K</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 17 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇭🇷 Croatia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Grupo L</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">JUE, 18 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 18 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇬🇭 Ghana</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇵🇦 Panama</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ BMO Field</span>
+          <span class="tag">Grupo L</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 18 jun</div>
+        <div class="match-time-madrid">02:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(20:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇺🇿 Uzbekistan</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇴 Colombia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Azteca</span>
+          <span class="tag">Grupo K</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 18 jun</div>
+        <div class="match-time-madrid">18:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(12:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇿 Czechia</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇿🇦 South Africa</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Mercedes-Benz Stadium</span>
+          <span class="tag">Grupo A</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 18 jun</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇭 Switzerland</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇧🇦 Bosnia-Herzegovina</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ SoFi Stadium</span>
+          <span class="tag">Grupo B</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">VIE, 19 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 19 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇦 Canada</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇶🇦 Qatar</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ BC Place</span>
+          <span class="tag">Grupo B</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 19 jun</div>
+        <div class="match-time-madrid">02:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇲🇽 Mexico</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇰🇷 South Korea</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Akron</span>
+          <span class="tag">Grupo A</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 19 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇧🇷 Brazil</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇭🇹 Haiti</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Grupo C</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 19 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇲🇦 Morocco</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Grupo C</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">SÁB, 20 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 20 jun</div>
+        <div class="match-time-madrid">18:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(12:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇩🇪 Germany</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇪🇨 Ecuador</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Grupo E</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 20 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇺🇸 United States</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇦🇺 Australia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ NRG Stadium</span>
+          <span class="tag">Grupo D</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 20 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇵🇾 Paraguay</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇹🇷 Türkiye</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Grupo D</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 20 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇳🇱 Netherlands</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇯🇵 Japan</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lincoln Financial Field</span>
+          <span class="tag">Grupo F</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">DOM, 21 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 21 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇹🇳 Tunisia</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇺🇦 Ukraine</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lumen Field</span>
+          <span class="tag">Grupo F</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 21 jun</div>
+        <div class="match-time-madrid">04:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(22:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇮 Ivory Coast</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇼 Curaçao</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio BBVA</span>
+          <span class="tag">Grupo E</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 21 jun</div>
+        <div class="match-time-madrid">18:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(12:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇧🇪 Belgium</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇪🇬 Egypt</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Hard Rock Stadium</span>
+          <span class="tag">Grupo G</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  esp-match">
+      <div class="match-datetime">
+        <div class="match-date">dom, 21 jun</div>
+        <div class="match-time-madrid">18:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(12:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇪🇸 Spain</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇸🇦 Saudi Arabia</span>
+          
+          <span class="pill pill-red">ESP</span>
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Mercedes-Benz Stadium</span>
+          <span class="tag">Grupo H</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 21 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇮🇷 Iran</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇳🇿 New Zealand</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Grupo G</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 21 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇻 Cape Verde</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇺🇾 Uruguay</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio BBVA</span>
+          <span class="tag">Grupo H</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">LUN, 22 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 22 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇫🇷 France</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇮🇶 Iraq</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lincoln Financial Field</span>
+          <span class="tag">Grupo I</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 22 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇳🇴 Norway</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇸🇳 Senegal</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Grupo I</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row arg-match ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 22 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇦🇷 Argentina</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇦🇹 Austria</span>
+          <span class="pill pill-blue">ARG</span>
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Grupo J</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 22 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇵🇹 Portugal</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇺🇿 Uzbekistan</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ NRG Stadium</span>
+          <span class="tag">Grupo K</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 22 jun</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇬🇭 Ghana</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Grupo L</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">MAR, 23 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 23 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇵🇦 Panama</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇭🇷 Croatia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ BMO Field</span>
+          <span class="tag">Grupo L</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 23 jun</div>
+        <div class="match-time-madrid">02:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(20:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇴 Colombia</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇩 DR Congo</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Azteca</span>
+          <span class="tag">Grupo K</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 23 jun</div>
+        <div class="match-time-madrid">05:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(23:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇯🇴 Jordan</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇩🇿 Algeria</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Levi's Stadium</span>
+          <span class="tag">Grupo J</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">JUE, 25 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 25 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇲🇽 Mexico</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇿 Czechia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Azteca</span>
+          <span class="tag">Grupo A</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 25 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇿🇦 South Africa</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇰🇷 South Korea</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio BBVA</span>
+          <span class="tag">Grupo A</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">VIE, 26 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 26 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇧🇦 Bosnia-Herzegovina</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇦 Canada</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ BC Place</span>
+          <span class="tag">Grupo B</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 26 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇭 Switzerland</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇶🇦 Qatar</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Levi's Stadium</span>
+          <span class="tag">Grupo B</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">SÁB, 27 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 27 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇧🇷 Brazil</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Hard Rock Stadium</span>
+          <span class="tag">Grupo C</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 27 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇲🇦 Morocco</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇭🇹 Haiti</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Mercedes-Benz Stadium</span>
+          <span class="tag">Grupo C</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 27 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇺🇸 United States</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇹🇷 Türkiye</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio BBVA</span>
+          <span class="tag">Grupo D</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 27 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇵🇾 Paraguay</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇦🇺 Australia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lumen Field</span>
+          <span class="tag">Grupo D</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 27 jun</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇳🇱 Netherlands</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇹🇳 Tunisia</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ NRG Stadium</span>
+          <span class="tag">Grupo F</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 27 jun</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇯🇵 Japan</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇺🇦 Ukraine</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Levi's Stadium</span>
+          <span class="tag">Grupo F</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">DOM, 28 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇩🇪 Germany</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇼 Curaçao</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ NRG Stadium</span>
+          <span class="tag">Grupo E</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇮 Ivory Coast</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇪🇨 Ecuador</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Grupo E</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇳🇿 New Zealand</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇪🇬 Egypt</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ BC Place</span>
+          <span class="tag">Grupo G</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇮🇷 Iran</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇧🇪 Belgium</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Akron</span>
+          <span class="tag">Grupo G</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">17:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(11:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇫🇷 France</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇳🇴 Norway</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Grupo I</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">17:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(11:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇸🇳 Senegal</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇮🇶 Iraq</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Grupo I</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row arg-match ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇦🇷 Argentina</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇯🇴 Jordan</span>
+          <span class="pill pill-blue">ARG</span>
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Grupo J</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇩🇿 Algeria</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇦🇹 Austria</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Akron</span>
+          <span class="tag">Grupo J</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 2º Grupo A</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo B</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ SoFi Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  esp-match">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇪🇸 Spain</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇺🇾 Uruguay</span>
+          
+          <span class="pill pill-red">ESP</span>
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lincoln Financial Field</span>
+          <span class="tag">Grupo H</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 28 jun</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇸🇦 Saudi Arabia</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇻 Cape Verde</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Mercedes-Benz Stadium</span>
+          <span class="tag">Grupo H</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">LUN, 29 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 29 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇵🇹 Portugal</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇨🇩 DR Congo</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio BBVA</span>
+          <span class="tag">Grupo K</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 29 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇨🇴 Colombia</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇺🇿 Uzbekistan</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Grupo K</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 29 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo C</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo F</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ NRG Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 29 jun</div>
+        <div class="match-time-madrid">22:30 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:30 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo E</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 3º A/B/C/D</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 29 jun</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇵🇦 Panama</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Grupo L</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 29 jun</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🇭🇷 Croatia</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🇬🇭 Ghana</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lincoln Financial Field</span>
+          <span class="tag">Grupo L</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Fase de Grupos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">MAR, 30 JUN</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 30 jun</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo F</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo C</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio BBVA</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 30 jun</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo C</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo F</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ NRG Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 30 jun</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo I</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 3º C/D/F/G</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">MIÉ, 01 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 01 jul</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo A</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 3º C/E/F/H</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio Azteca</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 01 jul</div>
+        <div class="match-time-madrid">18:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(12:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo L</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 3º E/H/I/J</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Mercedes-Benz Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 01 jul</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 2º Grupo E</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo I</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 01 jul</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo G</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo K</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Hard Rock Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">JUE, 02 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 02 jul</div>
+        <div class="match-time-madrid">01:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(19:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo K</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo L</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lincoln Financial Field</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 02 jul</div>
+        <div class="match-time-madrid">03:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(21:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 2º Grupo G</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo D</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Estadio BBVA</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row arg-match ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 02 jul</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo H</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ Argentina (si 2ª J)</span>
+          <span class="pill pill-blue">ARG</span>
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ SoFi Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">VIE, 03 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 03 jul</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo D</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo A</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row arg-match ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 03 jul</div>
+        <div class="match-time-madrid">22:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(16:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ Argentina (si 1ª J)</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 2º Grupo H</span>
+          <span class="pill pill-blue">ARG</span>
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Hard Rock Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 03 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ 1º Grupo B</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ 3º G/J/K/L</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">1/16 Final</span>
+          <span class="tag tv">📺 DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">1/16 Final</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">DOM, 05 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 05 jul</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. M1 Octavos</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. M2 Octavos</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ NRG Stadium</span>
+          <span class="tag">Octavos de Final</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Octavos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 05 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. M3 Octavos</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. M4 Octavos</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Lincoln Financial Field</span>
+          <span class="tag">Octavos de Final</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Octavos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">LUN, 06 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row arg-match ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 06 jul</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. M5 Octavos</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. M6 Octavos</span>
+          <span class="pill pill-blue">ARG</span>
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Octavos de Final</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Octavos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">lun, 06 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. M7 Octavos</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. M8 Octavos</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Octavos de Final</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Octavos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">MAR, 07 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 07 jul</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. M9 Octavos</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. M10 Octavos</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ SoFi Stadium</span>
+          <span class="tag">Octavos de Final</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Octavos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 07 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. M11 Octavos</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. M12 Octavos</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Octavos de Final</span>
+          <span class="tag tv">📺 DAZN / La 1 (RTVE)</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Octavos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">JUE, 09 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">jue, 09 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. Cuartos A</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. Cuartos B</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Cuartos de Final</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Cuartos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">VIE, 10 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">vie, 10 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. Cuartos C</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. Cuartos D</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Cuartos de Final</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Cuartos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">SÁB, 11 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 11 jul</div>
+        <div class="match-time-madrid">19:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(13:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. Cuartos E</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. Cuartos F</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ Gillette Stadium</span>
+          <span class="tag">Cuartos de Final</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Cuartos</span>
+      </div>
+    </div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 11 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. Cuartos G</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. Cuartos H</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ SoFi Stadium</span>
+          <span class="tag">Cuartos de Final</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Cuartos</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">MAR, 14 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mar, 14 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. Semi A</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. Semi B</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">Semifinal</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Semifinal</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">MIÉ, 15 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">mié, 15 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 CDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ G. Semi C</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ G. Semi D</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ AT&amp;T Stadium</span>
+          <span class="tag">Semifinal</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">Semifinal</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">SÁB, 18 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">sáb, 18 jul</div>
+        <div class="match-time-madrid">23:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(17:00 PDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ Perdedor Semi A</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ Perdedor Semi B</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ SoFi Stadium</span>
+          <span class="tag">Tercer Puesto</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">3er Puesto</span>
+      </div>
+    </div><div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">DOM, 19 JUL</div><div class="date-sep-line"></div></div>
+    <div class="match-row  ">
+      <div class="match-datetime">
+        <div class="match-date">dom, 19 jul</div>
+        <div class="match-time-madrid">21:00 <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        <div class="match-time-local">(15:00 EDT)</div>
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>🏳️ Ganador Semi A</span>
+          <span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>
+          <span>🏳️ Ganador Semi B</span>
+          
+          
+        </div>
+        <div class="match-meta">
+          <span class="tag">🏟️ MetLife Stadium</span>
+          <span class="tag">⭐ FINAL</span>
+          <span class="tag tv">📺 La 1 (RTVE) / DAZN</span>
+        </div>
+      </div>
+      <div class="match-status">
+        <span class="status-badge status-upcoming">⏳ Próximo</span>
+        <span class="match-phase-tag">⭐ FINAL</span>
+      </div>
+    </div></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-grupos">
+    <div class="card">
+      <div class="section-title">📊 Fase de Grupos — Clasificación</div>
+      <div class="nota" style="margin-bottom:14px">🟢 = Clasificados (top 2 por grupo + 8 mejores terceros) · Los datos se actualizan automáticamente desde la API durante el torneo.</div>
+      <div class="groups-grid" id="groupsGrid">
+  <div class="group-card arg-group ">
+    <div class="group-header">
+      Grupo J
+      <span style="font-size:0.7rem;color:var(--arg-celeste)">⭐ Argentina</span>
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="arg-row   ">
+          <td>1</td>
+          <td class="team-name">🇦🇷 Argentina</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇦🇹 Austria</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇩🇿 Algeria</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇯🇴 Jordan</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  esp-group">
+    <div class="group-header">
+      Grupo H
+      
+      <span style="font-size:0.7rem;color:#ff8080">🇪🇸 España</span>
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class=" esp-row  ">
+          <td>1</td>
+          <td class="team-name">🇪🇸 Spain</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇺🇾 Uruguay</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇸🇦 Saudi Arabia</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇨🇻 Cape Verde</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo A
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇲🇽 Mexico</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇰🇷 South Korea</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇨🇿 Czechia</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇿🇦 South Africa</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo B
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇨🇭 Switzerland</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇨🇦 Canada</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇧🇦 Bosnia-Herzegovina</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇶🇦 Qatar</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo C
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇧🇷 Brazil</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇲🇦 Morocco</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇭🇹 Haiti</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo D
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇺🇸 United States</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇵🇾 Paraguay</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇦🇺 Australia</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇹🇷 Türkiye</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo E
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇩🇪 Germany</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇨🇮 Ivory Coast</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇪🇨 Ecuador</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇨🇼 Curaçao</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo F
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇳🇱 Netherlands</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇯🇵 Japan</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇺🇦 Ukraine</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇹🇳 Tunisia</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo G
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇧🇪 Belgium</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇪🇬 Egypt</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇮🇷 Iran</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇳🇿 New Zealand</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo I
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇫🇷 France</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇳🇴 Norway</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇸🇳 Senegal</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇮🇶 Iraq</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo K
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🇵🇹 Portugal</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇨🇴 Colombia</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇺🇿 Uzbekistan</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇨🇩 DR Congo</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div>
+  <div class="group-card  ">
+    <div class="group-header">
+      Grupo L
+      
+      
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody><tr class="   ">
+          <td>1</td>
+          <td class="team-name">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>2</td>
+          <td class="team-name">🇭🇷 Croatia</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>3</td>
+          <td class="team-name">🇬🇭 Ghana</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr><tr class="   ">
+          <td>4</td>
+          <td class="team-name">🇵🇦 Panama</td>
+          <td>0</td><td>0</td><td>0</td><td>0</td>
+          <td>0</td><td>0</td>
+          <td>+0</td>
+          <td class="pts">0</td>
+        </tr></tbody>
+    </table>
+  </div></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-bracket">
+    <div class="card">
+      <div class="section-title">🏆 Fase Eliminatoria — Bracket</div>
+      <div class="nota" style="margin-bottom:12px">Dieciseisavos desde el 28 Jun. <span class="pill pill-blue">ARG</span> = Ruta de Argentina. Espacios vacíos se completan conforme avanza el torneo.</div>
+      <div class="bracket-scroll"><div class="bracket" id="bracketDiv"><div class="bracket-round"><div class="bracket-round-title">1/16 Final</div><div class="bracket-matches"><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 2º Grupo A 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo B 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo C 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo F 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo E 
+          </div>
+          <div class="bracket-team  ">🏳️ 3º A/B/C/D 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo F 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo C 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo C 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo F 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo I 
+          </div>
+          <div class="bracket-team  ">🏳️ 3º C/D/F/G 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo A 
+          </div>
+          <div class="bracket-team  ">🏳️ 3º C/E/F/H 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo L 
+          </div>
+          <div class="bracket-team  ">🏳️ 3º E/H/I/J 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 2º Grupo E 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo I 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo G 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo K 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo K 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo L 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 2º Grupo G 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo D 
+          </div>
+        </div><div class="bracket-match arg-path ">
+          <div class="bracket-team  ">🏳️ 1º Grupo H 
+          </div>
+          <div class="bracket-team  arg-team">🏳️ Argentina (si 2ª J) 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo D 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo A 
+          </div>
+        </div><div class="bracket-match arg-path ">
+          <div class="bracket-team  arg-team">🏳️ Argentina (si 1ª J) 
+          </div>
+          <div class="bracket-team  ">🏳️ 2º Grupo H 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ 1º Grupo B 
+          </div>
+          <div class="bracket-team  ">🏳️ 3º G/J/K/L 
+          </div>
+        </div></div></div><div class="bracket-round"><div class="bracket-round-title">Octavos</div><div class="bracket-matches"><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. M1 Octavos 
+          </div>
+          <div class="bracket-team  ">🏳️ G. M2 Octavos 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. M3 Octavos 
+          </div>
+          <div class="bracket-team  ">🏳️ G. M4 Octavos 
+          </div>
+        </div><div class="bracket-match arg-path ">
+          <div class="bracket-team  ">🏳️ G. M5 Octavos 
+          </div>
+          <div class="bracket-team  arg-team">🏳️ G. M6 Octavos 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. M7 Octavos 
+          </div>
+          <div class="bracket-team  ">🏳️ G. M8 Octavos 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. M9 Octavos 
+          </div>
+          <div class="bracket-team  ">🏳️ G. M10 Octavos 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. M11 Octavos 
+          </div>
+          <div class="bracket-team  ">🏳️ G. M12 Octavos 
+          </div>
+        </div></div></div><div class="bracket-round"><div class="bracket-round-title">Cuartos</div><div class="bracket-matches"><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. Cuartos A 
+          </div>
+          <div class="bracket-team  ">🏳️ G. Cuartos B 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. Cuartos C 
+          </div>
+          <div class="bracket-team  ">🏳️ G. Cuartos D 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. Cuartos E 
+          </div>
+          <div class="bracket-team  ">🏳️ G. Cuartos F 
+          </div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team  ">🏳️ G. Cuartos G 
+          </div>
+          <div class="bracket-team  ">🏳️ G. Cuartos H 
+          </div>
+        </div></div></div><div class="bracket-round"><div class="bracket-round-title">Semis</div><div class="bracket-matches"><div class="bracket-match  ">
+          <div class="bracket-team tbd">Por confirmar</div>
+          <div class="bracket-team tbd">Por confirmar</div>
+        </div><div class="bracket-match  ">
+          <div class="bracket-team tbd">Por confirmar</div>
+          <div class="bracket-team tbd">Por confirmar</div>
+        </div></div></div><div class="bracket-round"><div class="bracket-round-title">FINAL ⭐</div><div class="bracket-matches"><div class="bracket-match  final-match">
+          <div class="bracket-team  ">🏳️ Ganador Semi A 
+          </div>
+          <div class="bracket-team  ">🏳️ Ganador Semi B 
+          </div>
+        </div></div></div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div>⚽ <strong>Mundial FIFA 2026</strong> — Dashboard en tiempo real para aficionados argentinos en Madrid</div>
+  <div>📡 Datos en vivo: <a href="https://football-data.org/" target="_blank">football-data.org API v4</a> · Fallback estático: FIFA.com / ESPN Deportes / La Nación ARG / CNN Español</div>
+  <div>📺 <strong>TV España:</strong> DAZN (104 partidos) · La 1/Teledeporte RTVE (España, semis, final + 1 por jornada) · Movistar+ (vía DAZN)</div>
+  <div style="margin-top:4px;color:var(--text-dim)">Horarios en Europa/Madrid CEST (UTC+2) · Auto-refresco cada 3 minutos · 7 junio 2026</div>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════
+const API_KEY  = 'e1c0d6055eed4bd8bb3ce7fb78c25fd5';
+const API_BASE = 'https://api.football-data.org/v4';
+const WC       = 'WC';
+const ARG_ID   = 762;
+const ESP_ID   = 760;
+
+// ════════════════════════════════════════════════════
+// FLAGS
+// ════════════════════════════════════════════════════
+const FL = {
+  'Argentina':'🇦🇷','Algeria':'🇩🇿','Austria':'🇦🇹','Jordan':'🇯🇴',
+  'Spain':'🇪🇸','Uruguay':'🇺🇾','Saudi Arabia':'🇸🇦','Cape Verde':'🇨🇻',
+  'Mexico':'🇲🇽','South Korea':'🇰🇷','South Africa':'🇿🇦','Czechia':'🇨🇿',
+  'Canada':'🇨🇦','Qatar':'🇶🇦','Switzerland':'🇨🇭','Bosnia-Herzegovina':'🇧🇦',
+  'Brazil':'🇧🇷','Morocco':'🇲🇦','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Haiti':'🇭🇹',
+  'United States':'🇺🇸','USA':'🇺🇸','Paraguay':'🇵🇾','Australia':'🇦🇺',
+  'Türkiye':'🇹🇷','Turkey':'🇹🇷','Germany':'🇩🇪','Ivory Coast':'🇨🇮',
+  "Côte d'Ivoire":'🇨🇮','Ecuador':'🇪🇨','Curaçao':'🇨🇼',
+  'Netherlands':'🇳🇱','Japan':'🇯🇵','Tunisia':'🇹🇳','Ukraine':'🇺🇦',
+  'Belgium':'🇧🇪','Egypt':'🇪🇬','Iran':'🇮🇷','New Zealand':'🇳🇿',
+  'France':'🇫🇷','Senegal':'🇸🇳','Norway':'🇳🇴','Iraq':'🇮🇶',
+  'Portugal':'🇵🇹','Colombia':'🇨🇴','Uzbekistan':'🇺🇿','DR Congo':'🇨🇩',
+  'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croatia':'🇭🇷','Ghana':'🇬🇭','Panama':'🇵🇦',
+};
+const f = n => FL[n]||'🏳️';
+
+// ════════════════════════════════════════════════════
+// STATIC DATA — 104 partidos completos
+// ════════════════════════════════════════════════════
+// Fechas en UTC. Madrid CEST = UTC+2.
+// Kansas City/Dallas/Houston/Atlanta/Miami = CDT (UTC-5) → Madrid = UTC+2 → +7h
+// New York/Boston/Philadelphia/Toronto/Miami = EDT (UTC-4) → Madrid +6h
+// LA/Seattle/SF/Vancouver = PDT (UTC-7) → Madrid +9h
+// Mexico City/Guadalajara/Monterrey = CDT (UTC-5) → Madrid +7h
+
+const STATIC_MATCHES = [
+ // ── GRUPO A ──
+ {id:1,utcDate:'2026-06-11T19:00:00Z',local:'15:00 CDT',home:'Mexico',away:'South Africa',venue:'Estadio Azteca',city:'Ciudad de México',group:'Grupo A',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:2,utcDate:'2026-06-12T00:00:00Z',local:'19:00 CDT',home:'South Korea',away:'Czechia',venue:'Estadio Akron',city:'Guadalajara',group:'Grupo A',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:3,utcDate:'2026-06-18T16:00:00Z',local:'12:00 EDT',home:'Czechia',away:'South Africa',venue:'Mercedes-Benz Stadium',city:'Atlanta',group:'Grupo A',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:4,utcDate:'2026-06-19T00:00:00Z',local:'19:00 CDT',home:'Mexico',away:'South Korea',venue:'Estadio Akron',city:'Guadalajara',group:'Grupo A',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:5,utcDate:'2026-06-24T23:00:00Z',local:'19:00 CDT',home:'Mexico',away:'Czechia',venue:'Estadio Azteca',city:'Ciudad de México',group:'Grupo A',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:6,utcDate:'2026-06-24T23:00:00Z',local:'15:00 CDT',home:'South Africa',away:'South Korea',venue:'Estadio BBVA',city:'Monterrey',group:'Grupo A',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO B ──
+ {id:7,utcDate:'2026-06-12T20:00:00Z',local:'16:00 EDT',home:'Canada',away:'Bosnia-Herzegovina',venue:'BMO Field',city:'Toronto',group:'Grupo B',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:8,utcDate:'2026-06-13T17:00:00Z',local:'13:00 EDT',home:'Qatar',away:'Switzerland',venue:"Levi's Stadium",city:'San Francisco/Santa Clara',group:'Grupo B',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:9,utcDate:'2026-06-18T19:00:00Z',local:'15:00 PDT',home:'Switzerland',away:'Bosnia-Herzegovina',venue:'SoFi Stadium',city:'Inglewood/Los Ángeles',group:'Grupo B',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:10,utcDate:'2026-06-18T23:00:00Z',local:'19:00 EDT',home:'Canada',away:'Qatar',venue:'BC Place',city:'Vancouver',group:'Grupo B',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:11,utcDate:'2026-06-25T23:00:00Z',local:'19:00 EDT',home:'Bosnia-Herzegovina',away:'Canada',venue:'BC Place',city:'Vancouver',group:'Grupo B',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:12,utcDate:'2026-06-25T23:00:00Z',local:'19:00 PDT',home:'Switzerland',away:'Qatar',venue:"Levi's Stadium",city:'San Francisco/Santa Clara',group:'Grupo B',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO C ──
+ {id:13,utcDate:'2026-06-13T17:00:00Z',local:'13:00 EDT',home:'Brazil',away:'Morocco',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Grupo C',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:14,utcDate:'2026-06-13T23:00:00Z',local:'19:00 EDT',home:'Haiti',away:'Scotland',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Grupo C',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:15,utcDate:'2026-06-19T17:00:00Z',local:'13:00 EDT',home:'Brazil',away:'Haiti',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Grupo C',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:16,utcDate:'2026-06-19T20:00:00Z',local:'16:00 EDT',home:'Morocco',away:'Scotland',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Grupo C',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:17,utcDate:'2026-06-26T23:00:00Z',local:'19:00 EDT',home:'Brazil',away:'Scotland',venue:'Hard Rock Stadium',city:'Miami Gardens',group:'Grupo C',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:18,utcDate:'2026-06-26T23:00:00Z',local:'19:00 EDT',home:'Morocco',away:'Haiti',venue:'Mercedes-Benz Stadium',city:'Atlanta',group:'Grupo C',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO D ──
+ {id:19,utcDate:'2026-06-14T20:00:00Z',local:'16:00 EDT',home:'Australia',away:'Türkiye',venue:'Lumen Field',city:'Seattle',group:'Grupo D',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:20,utcDate:'2026-06-15T01:00:00Z',local:'21:00 EDT',home:'United States',away:'Paraguay',venue:'SoFi Stadium',city:'Inglewood/Los Ángeles',group:'Grupo D',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:21,utcDate:'2026-06-20T17:00:00Z',local:'13:00 CDT',home:'United States',away:'Australia',venue:'NRG Stadium',city:'Houston',group:'Grupo D',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:22,utcDate:'2026-06-20T20:00:00Z',local:'16:00 CDT',home:'Paraguay',away:'Türkiye',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Grupo D',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:23,utcDate:'2026-06-27T01:00:00Z',local:'21:00 CDT',home:'United States',away:'Türkiye',venue:'Estadio BBVA',city:'Monterrey',group:'Grupo D',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:24,utcDate:'2026-06-27T01:00:00Z',local:'21:00 EDT',home:'Paraguay',away:'Australia',venue:'Lumen Field',city:'Seattle',group:'Grupo D',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO E ──
+ {id:25,utcDate:'2026-06-15T16:00:00Z',local:'12:00 EDT',home:'Germany',away:'Ivory Coast',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Grupo E',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:26,utcDate:'2026-06-16T01:00:00Z',local:'21:00 EDT',home:'Ecuador',away:'Curaçao',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Grupo E',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:27,utcDate:'2026-06-20T16:00:00Z',local:'12:00 EDT',home:'Germany',away:'Ecuador',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Grupo E',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:28,utcDate:'2026-06-21T02:00:00Z',local:'22:00 CDT',home:'Ivory Coast',away:'Curaçao',venue:'Estadio BBVA',city:'Monterrey',group:'Grupo E',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:29,utcDate:'2026-06-27T23:00:00Z',local:'19:00 CDT',home:'Germany',away:'Curaçao',venue:'NRG Stadium',city:'Houston',group:'Grupo E',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:30,utcDate:'2026-06-27T23:00:00Z',local:'19:00 CDT',home:'Ivory Coast',away:'Ecuador',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Grupo E',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO F ──
+ {id:31,utcDate:'2026-06-16T17:00:00Z',local:'13:00 EDT',home:'Japan',away:'Tunisia',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Grupo F',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:32,utcDate:'2026-06-16T20:00:00Z',local:'16:00 EDT',home:'Netherlands',away:'Ukraine',venue:'Lincoln Financial Field',city:'Filadelfia',group:'Grupo F',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:33,utcDate:'2026-06-20T20:00:00Z',local:'16:00 EDT',home:'Netherlands',away:'Japan',venue:'Lincoln Financial Field',city:'Filadelfia',group:'Grupo F',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:34,utcDate:'2026-06-21T01:00:00Z',local:'21:00 EDT',home:'Tunisia',away:'Ukraine',venue:'Lumen Field',city:'Seattle',group:'Grupo F',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:35,utcDate:'2026-06-27T21:00:00Z',local:'19:00 CDT',home:'Netherlands',away:'Tunisia',venue:'NRG Stadium',city:'Houston',group:'Grupo F',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:36,utcDate:'2026-06-27T21:00:00Z',local:'17:00 PDT',home:'Japan',away:'Ukraine',venue:"Levi's Stadium",city:'San Francisco/Santa Clara',group:'Grupo F',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO G ──
+ {id:37,utcDate:'2026-06-14T18:00:00Z',local:'14:00 EDT',home:'Egypt',away:'Iran',venue:'Hard Rock Stadium',city:'Miami Gardens',group:'Grupo G',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:38,utcDate:'2026-06-15T01:00:00Z',local:'17:00 PDT',home:'Belgium',away:'New Zealand',venue:'SoFi Stadium',city:'Inglewood/Los Ángeles',group:'Grupo G',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:39,utcDate:'2026-06-21T16:00:00Z',local:'12:00 EDT',home:'Belgium',away:'Egypt',venue:'Hard Rock Stadium',city:'Miami Gardens',group:'Grupo G',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:40,utcDate:'2026-06-21T20:00:00Z',local:'16:00 EDT',home:'Iran',away:'New Zealand',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Grupo G',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:41,utcDate:'2026-06-28T01:00:00Z',local:'21:00 PDT',home:'New Zealand',away:'Egypt',venue:'BC Place',city:'Vancouver',group:'Grupo G',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:42,utcDate:'2026-06-28T01:00:00Z',local:'21:00 CDT',home:'Iran',away:'Belgium',venue:'Estadio Akron',city:'Guadalajara',group:'Grupo G',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO H (ESPAÑA) ──
+ {id:43,utcDate:'2026-06-15T16:00:00Z',local:'12:00 EDT',home:'Spain',away:'Cape Verde',venue:'Mercedes-Benz Stadium',city:'Atlanta',group:'Grupo H',stage:'GROUP_STAGE',tv:'La 1 (RTVE) / DAZN',esp:true},
+ {id:44,utcDate:'2026-06-15T19:00:00Z',local:'15:00 EDT',home:'Uruguay',away:'Saudi Arabia',venue:'Hard Rock Stadium',city:'Miami Gardens',group:'Grupo H',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:45,utcDate:'2026-06-21T16:00:00Z',local:'12:00 EDT',home:'Spain',away:'Saudi Arabia',venue:'Mercedes-Benz Stadium',city:'Atlanta',group:'Grupo H',stage:'GROUP_STAGE',tv:'La 1 (RTVE) / DAZN',esp:true},
+ {id:46,utcDate:'2026-06-21T20:00:00Z',local:'16:00 CDT',home:'Cape Verde',away:'Uruguay',venue:'Estadio BBVA',city:'Monterrey',group:'Grupo H',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:47,utcDate:'2026-06-28T21:00:00Z',local:'17:00 EDT',home:'Spain',away:'Uruguay',venue:'Lincoln Financial Field',city:'Filadelfia',group:'Grupo H',stage:'GROUP_STAGE',tv:'La 1 (RTVE) / DAZN',esp:true},
+ {id:48,utcDate:'2026-06-28T21:00:00Z',local:'17:00 EDT',home:'Saudi Arabia',away:'Cape Verde',venue:'Mercedes-Benz Stadium',city:'Atlanta',group:'Grupo H',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO I ──
+ {id:49,utcDate:'2026-06-16T23:00:00Z',local:'19:00 EDT',home:'France',away:'Senegal',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Grupo I',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:50,utcDate:'2026-06-16T20:00:00Z',local:'16:00 EDT',home:'Iraq',away:'Norway',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Grupo I',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:51,utcDate:'2026-06-21T23:00:00Z',local:'19:00 EDT',home:'France',away:'Iraq',venue:'Lincoln Financial Field',city:'Filadelfia',group:'Grupo I',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:52,utcDate:'2026-06-21T23:00:00Z',local:'19:00 EDT',home:'Norway',away:'Senegal',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Grupo I',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:53,utcDate:'2026-06-28T15:00:00Z',local:'11:00 EDT',home:'France',away:'Norway',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Grupo I',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:54,utcDate:'2026-06-28T15:00:00Z',local:'11:00 CDT',home:'Senegal',away:'Iraq',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Grupo I',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO J (ARGENTINA) ★ ──
+ {id:55,utcDate:'2026-06-17T01:00:00Z',local:'21:00 CDT',home:'Argentina',away:'Algeria',venue:'Arrowhead Stadium',city:'Kansas City, Missouri',group:'Grupo J',stage:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {id:56,utcDate:'2026-06-17T04:00:00Z',local:'00:00 PDT',home:'Austria',away:'Jordan',venue:"Levi's Stadium",city:'San Francisco/Santa Clara',group:'Grupo J',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:57,utcDate:'2026-06-22T17:00:00Z',local:'13:00 CDT',home:'Argentina',away:'Austria',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Grupo J',stage:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {id:58,utcDate:'2026-06-23T03:00:00Z',local:'23:00 PDT',home:'Jordan',away:'Algeria',venue:"Levi's Stadium",city:'San Francisco/Santa Clara',group:'Grupo J',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:59,utcDate:'2026-06-28T19:00:00Z',local:'15:00 CDT',home:'Argentina',away:'Jordan',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Grupo J',stage:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {id:60,utcDate:'2026-06-28T19:00:00Z',local:'15:00 CDT',home:'Algeria',away:'Austria',venue:'Estadio Akron',city:'Guadalajara',group:'Grupo J',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO K ──
+ {id:61,utcDate:'2026-06-17T17:00:00Z',local:'13:00 CDT',home:'Portugal',away:'DR Congo',venue:'NRG Stadium',city:'Houston',group:'Grupo K',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:62,utcDate:'2026-06-18T00:00:00Z',local:'20:00 CDT',home:'Uzbekistan',away:'Colombia',venue:'Estadio Azteca',city:'Ciudad de México',group:'Grupo K',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:63,utcDate:'2026-06-22T17:00:00Z',local:'13:00 CDT',home:'Portugal',away:'Uzbekistan',venue:'NRG Stadium',city:'Houston',group:'Grupo K',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:64,utcDate:'2026-06-23T00:00:00Z',local:'20:00 CDT',home:'Colombia',away:'DR Congo',venue:'Estadio Azteca',city:'Ciudad de México',group:'Grupo K',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:65,utcDate:'2026-06-29T01:00:00Z',local:'21:00 CDT',home:'Portugal',away:'DR Congo',venue:'Estadio BBVA',city:'Monterrey',group:'Grupo K',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:66,utcDate:'2026-06-29T01:00:00Z',local:'21:00 CDT',home:'Colombia',away:'Uzbekistan',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Grupo K',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── GRUPO L ──
+ {id:67,utcDate:'2026-06-17T20:00:00Z',local:'16:00 EDT',home:'England',away:'Croatia',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Grupo L',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:68,utcDate:'2026-06-17T23:00:00Z',local:'19:00 EDT',home:'Ghana',away:'Panama',venue:'BMO Field',city:'Toronto',group:'Grupo L',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:69,utcDate:'2026-06-22T20:00:00Z',local:'16:00 EDT',home:'England',away:'Ghana',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Grupo L',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:70,utcDate:'2026-06-22T23:00:00Z',local:'19:00 EDT',home:'Panama',away:'Croatia',venue:'BMO Field',city:'Toronto',group:'Grupo L',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:71,utcDate:'2026-06-29T21:00:00Z',local:'17:00 EDT',home:'England',away:'Panama',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Grupo L',stage:'GROUP_STAGE',tv:'DAZN'},
+ {id:72,utcDate:'2026-06-29T21:00:00Z',local:'17:00 EDT',home:'Croatia',away:'Ghana',venue:'Lincoln Financial Field',city:'Filadelfia',group:'Grupo L',stage:'GROUP_STAGE',tv:'DAZN'},
+ // ── 1/16 DE FINAL ──
+ {id:73,utcDate:'2026-06-28T19:00:00Z',local:'13:00 PDT',home:'2º Grupo A',away:'2º Grupo B',venue:'SoFi Stadium',city:'Inglewood/Los Ángeles',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:74,utcDate:'2026-06-29T17:00:00Z',local:'13:00 CDT',home:'1º Grupo C',away:'2º Grupo F',venue:'NRG Stadium',city:'Houston',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:75,utcDate:'2026-06-29T20:30:00Z',local:'16:30 EDT',home:'1º Grupo E',away:'3º A/B/C/D',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:76,utcDate:'2026-06-30T01:00:00Z',local:'21:00 CDT',home:'1º Grupo F',away:'2º Grupo C',venue:'Estadio BBVA',city:'Monterrey',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:77,utcDate:'2026-06-30T17:00:00Z',local:'13:00 CDT',home:'1º Grupo C',away:'2º Grupo F',venue:'NRG Stadium',city:'Houston',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:78,utcDate:'2026-06-30T21:00:00Z',local:'17:00 EDT',home:'1º Grupo I',away:'3º C/D/F/G',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:79,utcDate:'2026-07-01T17:00:00Z',local:'13:00 CDT',home:'2º Grupo E',away:'2º Grupo I',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:80,utcDate:'2026-07-01T01:00:00Z',local:'21:00 CDT',home:'1º Grupo A',away:'3º C/E/F/H',venue:'Estadio Azteca',city:'Ciudad de México',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:81,utcDate:'2026-07-01T16:00:00Z',local:'12:00 EDT',home:'1º Grupo L',away:'3º E/H/I/J',venue:'Mercedes-Benz Stadium',city:'Atlanta',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:82,utcDate:'2026-07-01T19:00:00Z',local:'15:00 EDT',home:'1º Grupo G',away:'2º Grupo K',venue:'Hard Rock Stadium',city:'Miami Gardens',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:83,utcDate:'2026-07-01T23:00:00Z',local:'19:00 EDT',home:'1º Grupo K',away:'2º Grupo L',venue:'Lincoln Financial Field',city:'Filadelfia',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ // ARG 1/16 si 1ª
+ {id:84,utcDate:'2026-07-03T20:00:00Z',local:'16:00 EDT',home:'Argentina (si 1ª J)',away:'2º Grupo H',venue:'Hard Rock Stadium',city:'Miami Gardens',group:'1/16 Final',stage:'LAST_32',tv:'DAZN / La 1 (RTVE)',arg:true},
+ // ARG 1/16 si 2ª
+ {id:85,utcDate:'2026-07-02T19:00:00Z',local:'15:00 PDT',home:'1º Grupo H',away:'Argentina (si 2ª J)',venue:'SoFi Stadium',city:'Inglewood/Los Ángeles',group:'1/16 Final',stage:'LAST_32',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {id:86,utcDate:'2026-07-02T01:00:00Z',local:'21:00 CDT',home:'2º Grupo G',away:'2º Grupo D',venue:'Estadio BBVA',city:'Monterrey',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:87,utcDate:'2026-07-03T17:00:00Z',local:'13:00 CDT',home:'1º Grupo D',away:'2º Grupo A',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ {id:88,utcDate:'2026-07-03T21:00:00Z',local:'17:00 EDT',home:'1º Grupo B',away:'3º G/J/K/L',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'1/16 Final',stage:'LAST_32',tv:'DAZN'},
+ // ── OCTAVOS ──
+ {id:89,utcDate:'2026-07-05T17:00:00Z',local:'13:00 CDT',home:'G. M1 Octavos',away:'G. M2 Octavos',venue:'NRG Stadium',city:'Houston',group:'Octavos de Final',stage:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
+ {id:90,utcDate:'2026-07-05T21:00:00Z',local:'17:00 EDT',home:'G. M3 Octavos',away:'G. M4 Octavos',venue:'Lincoln Financial Field',city:'Filadelfia',group:'Octavos de Final',stage:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
+ {id:91,utcDate:'2026-07-06T17:00:00Z',local:'13:00 CDT',home:'G. M5 Octavos',away:'G. M6 Octavos',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Octavos de Final',stage:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {id:92,utcDate:'2026-07-06T21:00:00Z',local:'17:00 EDT',home:'G. M7 Octavos',away:'G. M8 Octavos',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Octavos de Final',stage:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
+ {id:93,utcDate:'2026-07-07T17:00:00Z',local:'13:00 EDT',home:'G. M9 Octavos',away:'G. M10 Octavos',venue:'SoFi Stadium',city:'Inglewood/Los Ángeles',group:'Octavos de Final',stage:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
+ {id:94,utcDate:'2026-07-07T21:00:00Z',local:'17:00 EDT',home:'G. M11 Octavos',away:'G. M12 Octavos',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Octavos de Final',stage:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
+ // ── CUARTOS ──
+ {id:95,utcDate:'2026-07-09T21:00:00Z',local:'17:00 EDT',home:'G. Cuartos A',away:'G. Cuartos B',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Cuartos de Final',stage:'QUARTER_FINALS',tv:'La 1 (RTVE) / DAZN'},
+ {id:96,utcDate:'2026-07-10T21:00:00Z',local:'17:00 CDT',home:'G. Cuartos C',away:'G. Cuartos D',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Cuartos de Final',stage:'QUARTER_FINALS',tv:'La 1 (RTVE) / DAZN'},
+ {id:97,utcDate:'2026-07-11T17:00:00Z',local:'13:00 EDT',home:'G. Cuartos E',away:'G. Cuartos F',venue:'Gillette Stadium',city:'Foxborough/Boston',group:'Cuartos de Final',stage:'QUARTER_FINALS',tv:'La 1 (RTVE) / DAZN'},
+ {id:98,utcDate:'2026-07-11T21:00:00Z',local:'17:00 PDT',home:'G. Cuartos G',away:'G. Cuartos H',venue:'SoFi Stadium',city:'Inglewood/Los Ángeles',group:'Cuartos de Final',stage:'QUARTER_FINALS',tv:'La 1 (RTVE) / DAZN'},
+ // ── SEMIS ──
+ {id:99,utcDate:'2026-07-14T21:00:00Z',local:'17:00 EDT',home:'G. Semi A',away:'G. Semi B',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'Semifinal',stage:'SEMI_FINALS',tv:'La 1 (RTVE) / DAZN'},
+ {id:100,utcDate:'2026-07-15T21:00:00Z',local:'17:00 CDT',home:'G. Semi C',away:'G. Semi D',venue:'AT&T Stadium',city:'Arlington/Dallas',group:'Semifinal',stage:'SEMI_FINALS',tv:'La 1 (RTVE) / DAZN'},
+ // ── 3er PUESTO ──
+ {id:101,utcDate:'2026-07-18T21:00:00Z',local:'17:00 PDT',home:'Perdedor Semi A',away:'Perdedor Semi B',venue:'SoFi Stadium',city:'Inglewood/Los Ángeles',group:'Tercer Puesto',stage:'THIRD_PLACE',tv:'La 1 (RTVE) / DAZN'},
+ // ── FINAL ──
+ {id:102,utcDate:'2026-07-19T19:00:00Z',local:'15:00 EDT',home:'Ganador Semi A',away:'Ganador Semi B',venue:'MetLife Stadium',city:'East Rutherford, NJ',group:'⭐ FINAL',stage:'FINAL',tv:'La 1 (RTVE) / DAZN'},
+];
+
+// ════════════════════════════════════════════════════
+// STATIC GROUP DATA
+// ════════════════════════════════════════════════════
+const STATIC_GROUPS = {
+  J:{label:'Grupo J',arg:true,teams:[
+    {id:762, name:'Argentina',  pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {id:2271,name:'Austria',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {id:1607,name:'Algeria',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {id:850, name:'Jordan',     pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  H:{label:'Grupo H',esp:true,teams:[
+    {id:760, name:'Spain',      pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {id:788, name:'Uruguay',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {id:523, name:'Saudi Arabia',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {id:1076,name:'Cape Verde', pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  A:{label:'Grupo A',teams:[
+    {name:'Mexico',     pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'South Korea',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Czechia',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'South Africa',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  B:{label:'Grupo B',teams:[
+    {name:'Switzerland',       pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Canada',            pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Bosnia-Herzegovina',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Qatar',             pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  C:{label:'Grupo C',teams:[
+    {name:'Brazil', pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Morocco',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Scotland',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Haiti',  pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  D:{label:'Grupo D',teams:[
+    {name:'United States',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Paraguay',     pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Australia',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Türkiye',      pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  E:{label:'Grupo E',teams:[
+    {name:'Germany',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Ivory Coast',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Ecuador',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Curaçao',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  F:{label:'Grupo F',teams:[
+    {name:'Netherlands',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Japan',      pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Ukraine',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Tunisia',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  G:{label:'Grupo G',teams:[
+    {name:'Belgium',    pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Egypt',      pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Iran',       pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'New Zealand',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  I:{label:'Grupo I',teams:[
+    {name:'France', pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Norway', pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Senegal',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Iraq',   pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  K:{label:'Grupo K',teams:[
+    {name:'Portugal',  pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Colombia',  pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Uzbekistan',pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'DR Congo',  pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+  L:{label:'Grupo L',teams:[
+    {name:'England', pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Croatia', pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Ghana',   pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {name:'Panama',  pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+  ]},
+};
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let MATCHES   = [...STATIC_MATCHES];
+let STANDINGS = null; // null = use static
+let usingAPI  = false;
+
+// ════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════
+const pad = n => String(n).padStart(2,'0');
+
+function madridFmt(dt, opts){
+  return new Date(dt).toLocaleString('es-ES',{...opts,timeZone:'Europe/Madrid'});
+}
+function fmtDate(dt){
+  return madridFmt(dt,{weekday:'short',day:'2-digit',month:'short'});
+}
+function fmtTime(dt){
+  return madridFmt(dt,{hour:'2-digit',minute:'2-digit'});
+}
+
+function phaseLbl(s){
+  if(!s) return 'Grupos';
+  const u=s.toUpperCase();
+  if(u.includes('GROUP')) return 'Fase de Grupos';
+  if(u.includes('LAST_32')||u.includes('ROUND_OF_32')) return '1/16 Final';
+  if(u.includes('LAST_16')||u.includes('ROUND_OF_16')) return 'Octavos';
+  if(u.includes('QUARTER')) return 'Cuartos';
+  if(u.includes('SEMI')) return 'Semifinal';
+  if(u.includes('THIRD')) return '3er Puesto';
+  if(u==='FINAL') return '⭐ FINAL';
+  return s;
+}
+
+function isArg(m){
+  if(usingAPI) return m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
+  return m.arg===true;
+}
+function isEsp(m){
+  if(usingAPI) return m.homeTeam?.id===ESP_ID||m.awayTeam?.id===ESP_ID;
+  return m.esp===true;
+}
+function homeName(m){ return usingAPI?(m.homeTeam?.name||'?'):m.home; }
+function awayName(m){ return usingAPI?(m.awayTeam?.name||'?'):m.away; }
+function getStatus(m){
+  const s=(m.status||'SCHEDULED').toUpperCase();
+  if(s==='FINISHED') return 'played';
+  if(s==='IN_PLAY'||s==='PAUSED') return 'live';
+  return 'upcoming';
+}
+function getScore(m){
+  if(!usingAPI) return m.scoreH!==undefined&&m.scoreH!==null?`${m.scoreH} - ${m.scoreA}`:null;
+  const h=m.score?.fullTime?.home, a=m.score?.fullTime?.away;
+  if(h!==null&&h!==undefined&&(m.status==='FINISHED'||m.status==='IN_PLAY'||m.status==='PAUSED')) return `${h} - ${a}`;
+  return null;
+}
+function getTV(m){
+  if(!usingAPI) return m.tv||'DAZN';
+  const h=m.homeTeam?.name||'', a=m.awayTeam?.name||'';
+  const s=(m.stage||'').toUpperCase();
+  if(h.includes('Spain')||a.includes('Spain')) return 'La 1 (RTVE) / DAZN';
+  if(h.includes('Argentina')||a.includes('Argentina')) return 'DAZN / La 1 (RTVE)';
+  if(s.includes('SEMI')||s==='FINAL'||s.includes('THIRD')) return 'La 1 (RTVE) / DAZN';
+  return 'DAZN';
+}
+function getGroup(m){ return usingAPI?(m.group||phaseLbl(m.stage)):m.group; }
+function getVenue(m){ return usingAPI?m.venue:m.venue; }
+function getLocal(m){ return usingAPI?'':m.local; }
+
+// ════════════════════════════════════════════════════
+// API
+// ════════════════════════════════════════════════════
+async function loadData(silent=false){
+  if(!silent){
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+    document.getElementById('loadingSub').textContent='Conectando con football-data.org...';
+  }
+  setBadge('loading','● Cargando...');
+  try {
+    const [mRes, sRes] = await Promise.all([
+      fetch(`${API_BASE}/competitions/${WC}/matches`,{headers:{'X-Auth-Token':API_KEY}}),
+      fetch(`${API_BASE}/competitions/${WC}/standings`,{headers:{'X-Auth-Token':API_KEY}}).catch(()=>null)
+    ]);
+    if(!mRes.ok) throw new Error(`HTTP ${mRes.status}`);
+    const mData = await mRes.json();
+    if(mData.matches?.length){
+      MATCHES = mData.matches;
+      usingAPI = true;
+    }
+    if(sRes?.ok){
+      const sData = await sRes.json();
+      STANDINGS = buildStandings(sData);
+    }
+    setBadge('live','⬤ API en vivo');
+    setLastUpdate();
+  } catch(e){
+    console.warn('API error, using static data:', e);
+    MATCHES = [...STATIC_MATCHES];
+    usingAPI = false;
+    STANDINGS = null;
+    setBadge('static','⬤ Datos estáticos');
+  }
+  renderAll();
+  document.getElementById('loadingOverlay').classList.add('hidden');
+}
+
+function setBadge(type,txt){
+  const b=document.getElementById('apiBadge');
+  b.textContent=txt;
+  b.className='api-badge '+(type==='live'?'api-live':type==='static'?'api-static':'api-loading');
+}
+function setLastUpdate(){
+  document.getElementById('lastUpdate').textContent=
+    madridFmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
+}
+
+function buildStandings(data){
+  const out={};
+  (data.standings||[]).forEach(g=>{
+    const key=g.group||g.stage||'?';
+    out[key]=g.table||[];
+  });
+  return out;
+}
+
+// ════════════════════════════════════════════════════
+// RENDER ALL
+// ════════════════════════════════════════════════════
+function renderAll(){ renderHero(); renderMatches(); renderGroups(); renderBracket(); }
+
+// ════════════════════════════════════════════════════
+// HERO
+// ════════════════════════════════════════════════════
+function renderHero(){
+  const now=new Date();
+  const argMs=MATCHES.filter(isArg).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
+  const next=argMs.find(m=>new Date(m.utcDate)>now&&(m.status||'SCHEDULED')!=='FINISHED');
+
+  // Stats
+  let pj=0,g=0,e=0,p=0,gf=0,gc=0,pts=0,pos='1º';
+  if(STANDINGS){
+    const grp=Object.values(STANDINGS).find(arr=>arr.some(r=>r.team?.id===ARG_ID));
+    if(grp){
+      const row=grp.find(r=>r.team?.id===ARG_ID);
+      if(row){pj=row.playedGames||0;g=row.won||0;e=row.draw||0;p=row.lost||0;
+        gf=row.goalsFor||0;gc=row.goalsAgainst||0;pts=row.points||0;
+        pos=(grp.indexOf(row)+1)+'º';}
+    }
+  }
+  document.getElementById('s-pos').textContent=pos;
+  document.getElementById('s-pj').textContent=pj;
+  document.getElementById('s-g').textContent=g;
+  document.getElementById('s-e').textContent=e;
+  document.getElementById('s-p').textContent=p;
+  document.getElementById('s-gf').textContent=gf;
+  document.getElementById('s-gc').textContent=gc;
+  const dg=gf-gc;
+  document.getElementById('s-dg').textContent=(dg>=0?'+':'')+dg;
+  document.getElementById('s-pts').textContent=pts;
+
+  // Next match
+  if(next){
+    const hn=homeName(next), an=awayName(next);
+    const local=getLocal(next);
+    document.getElementById('nextMatchContent').innerHTML=`
+      <div class="match-teams-hero">
+        <div class="match-team-big">${f(hn)} ${hn}</div>
+        <div class="match-vs">VS</div>
+        <div class="match-team-big">${f(an)} ${an}</div>
+      </div>
+      <div class="match-info-row">
+        <span>📅 <strong>${fmtDate(new Date(next.utcDate))}</strong></span>
+        <span>🕑 <strong>${fmtTime(new Date(next.utcDate))} CEST</strong>${local?' ('+local+')':''}</span>
+        <span>🏟️ <strong>${getVenue(next)||'Por confirmar'}</strong></span>
+        <span>📺 <strong>${getTV(next)}</strong></span>
+      </div>`;
+    window._cdTarget=new Date(next.utcDate);
+    document.getElementById('cdLabel').textContent=`hasta ${hn} vs ${an}`;
+    // Alert < 24h
+    const diff=window._cdTarget-now;
+    const banner=document.getElementById('alertBanner');
+    if(diff>0&&diff<86400000){
+      banner.classList.add('show');
+      document.getElementById('alertText').textContent=
+        `🚨 ¡Argentina juega en menos de 24 horas! ${hn} vs ${an} · ${fmtTime(new Date(next.utcDate))} CEST · 📺 ${getTV(next)}`;
+    }
+  }
+
+  // History
+  const hist=document.getElementById('argHistory');
+  if(!argMs.length){hist.innerHTML='<div style="color:var(--text-muted);font-size:0.82rem">Sin datos</div>';return;}
+  hist.innerHTML=argMs.map(m=>{
+    const st=getStatus(m), hn=homeName(m), an=awayName(m);
+    const sc=getScore(m);
+    const argHome=usingAPI?m.homeTeam?.id===ARG_ID:(m.home==='Argentina');
+    const argGoals=argHome?m.score?.fullTime?.home:m.score?.fullTime?.away;
+    const rivGoals=argHome?m.score?.fullTime?.away:m.score?.fullTime?.home;
+    let cls='pending', badge='';
+    if(st==='played'){
+      const aG=usingAPI?(argGoals??0):(m.scoreH??0), rG=usingAPI?(rivGoals??0):(m.scoreA??0);
+      cls=aG>rG?'win':aG===rG?'draw':'loss';
+      badge=`<span class="res-score">${sc}</span>`;
+    } else if(st==='live'){
+      badge=`<span class="badge-live">🔴 EN VIVO</span>`;
+    } else {
+      badge=`<span class="badge-pending">⏳ ${fmtDate(new Date(m.utcDate))} ${fmtTime(new Date(m.utcDate))}</span>`;
+    }
+    return `<div class="result-item ${cls}">
+      <span class="res-phase">${getGroup(m)}</span>
+      <span class="res-teams">${f(hn)} ${hn} vs ${f(an)} ${an}</span>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// MATCH LIST
+// ════════════════════════════════════════════════════
+function renderMatches(){
+  const sorted=[...MATCHES].sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
+  let html='',lastDay='';
+  sorted.forEach(m=>{
+    const dt=new Date(m.utcDate);
+    const day=fmtDate(dt);
+    if(day!==lastDay){
+      html+=`<div class="date-sep"><div class="date-sep-line"></div><div class="date-sep-text">${day.toUpperCase()}</div><div class="date-sep-line"></div></div>`;
+      lastDay=day;
+    }
+    const argM=isArg(m),espM=isEsp(m),st=getStatus(m);
+    const hn=homeName(m),an=awayName(m),sc=getScore(m),local=getLocal(m);
+    let badge='';
+    if(st==='live')    badge=`<span class="status-badge status-live">🔴 EN VIVO</span>`;
+    else if(st==='played') badge=`<span class="status-badge status-played">✅ Jugado</span>`;
+    else               badge=`<span class="status-badge status-upcoming">⏳ Próximo</span>`;
+    html+=`
+    <div class="match-row ${argM?'arg-match':''} ${espM?'esp-match':''}">
+      <div class="match-datetime">
+        <div class="match-date">${fmtDate(dt)}</div>
+        <div class="match-time-madrid">${fmtTime(dt)} <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
+        ${local?`<div class="match-time-local">(${local})</div>`:''}
+      </div>
+      <div class="match-body">
+        <div class="match-teams-row">
+          <span>${f(hn)} ${hn}</span>
+          ${sc?`<span class="match-score-inline">${sc}</span>`:'<span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>'}
+          <span>${f(an)} ${an}</span>
+          ${argM?'<span class="pill pill-blue">ARG</span>':''}
+          ${espM?'<span class="pill pill-red">ESP</span>':''}
+        </div>
+        <div class="match-meta">
+          ${getVenue(m)?`<span class="tag">🏟️ ${getVenue(m)}</span>`:''}
+          <span class="tag">${getGroup(m)}</span>
+          <span class="tag tv">📺 ${getTV(m)}</span>
+        </div>
+      </div>
+      <div class="match-status">
+        ${badge}
+        <span class="match-phase-tag">${phaseLbl(m.stage)}</span>
+      </div>
+    </div>`;
+  });
+  document.getElementById('matchList').innerHTML=html||'<div style="color:var(--text-muted);padding:20px;text-align:center">Sin datos</div>';
+}
+
+// ════════════════════════════════════════════════════
+// GROUPS
+// ════════════════════════════════════════════════════
+function renderGroups(){
+  const container=document.getElementById('groupsGrid');
+  // Use API standings if available, else static
+  let entries;
+  if(STANDINGS&&Object.keys(STANDINGS).length){
+    entries=Object.entries(STANDINGS).sort(([a],[b])=>{
+      if(a.includes('J')) return -1; if(b.includes('J')) return 1;
+      if(a.includes('H')) return -1; if(b.includes('H')) return 1;
+      return a.localeCompare(b);
+    });
+    let html='';
+    entries.forEach(([gName,table])=>{
+      const hasArg=table.some(r=>r.team?.id===ARG_ID);
+      const hasEsp=table.some(r=>r.team?.id===ESP_ID);
+      const started=table.some(r=>r.playedGames>0);
+      html+=buildGroupCard(gName,table.map((r,i)=>({
+        name:r.team?.name||'?',id:r.team?.id,
+        pj:r.playedGames||0,g:r.won||0,e:r.draw||0,p:r.lost||0,
+        gf:r.goalsFor||0,gc:r.goalsAgainst||0,pts:r.points||0,
+        qualified:started&&i<2, eliminated:started&&i>=2&&r.playedGames===3,
+      })),hasArg,hasEsp);
+    });
+    container.innerHTML=html; return;
+  }
+  // Static
+  const order=['J','H','A','B','C','D','E','F','G','I','K','L'];
+  let html='';
+  order.forEach(k=>{
+    const g=STATIC_GROUPS[k]; if(!g) return;
+    html+=buildGroupCard(g.label,g.teams.map(t=>({...t,qualified:false,eliminated:false})),g.arg,g.esp);
+  });
+  container.innerHTML=html;
+}
+
+function buildGroupCard(label,teams,hasArg,hasEsp){
+  const dg=t=>(t.gf-t.gc);
+  return `
+  <div class="group-card ${hasArg?'arg-group':''} ${hasEsp&&!hasArg?'esp-group':''}">
+    <div class="group-header">
+      ${label}
+      ${hasArg?'<span style="font-size:0.7rem;color:var(--arg-celeste)">⭐ Argentina</span>':''}
+      ${hasEsp&&!hasArg?'<span style="font-size:0.7rem;color:#ff8080">🇪🇸 España</span>':''}
+    </div>
+    <table class="group-table">
+      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+      <tbody>${teams.map((t,i)=>{
+        const isA=t.id===ARG_ID||(t.name==='Argentina');
+        const isE=t.id===ESP_ID||(t.name==='Spain');
+        return `<tr class="${isA?'arg-row':''} ${isE?'esp-row':''} ${t.qualified?'qualified':''} ${t.eliminated?'eliminated':''}">
+          <td>${i+1}</td>
+          <td class="team-name">${f(t.name)} ${t.name}</td>
+          <td>${t.pj}</td><td>${t.g}</td><td>${t.e}</td><td>${t.p}</td>
+          <td>${t.gf}</td><td>${t.gc}</td>
+          <td>${dg(t)>=0?'+'+dg(t):dg(t)}</td>
+          <td class="pts">${t.pts}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════
+// BRACKET
+// ════════════════════════════════════════════════════
+function renderBracket(){
+  // Try to build from API matches if available, else use placeholders
+  const rounds=[
+    {title:'1/16 Final', stage:'LAST_32',     slots:16},
+    {title:'Octavos',    stage:'ROUND_OF_16', slots:8},
+    {title:'Cuartos',    stage:'QUARTER_FINALS',slots:4},
+    {title:'Semis',      stage:'SEMI_FINALS', slots:2},
+    {title:'FINAL ⭐',   stage:'FINAL',       slots:1},
+  ];
+  let html='';
+  rounds.forEach(r=>{
+    const ms=MATCHES.filter(m=>{
+      const u=(m.stage||'').toUpperCase();
+      if(r.stage==='LAST_32')      return u.includes('LAST_32')||u.includes('ROUND_OF_32');
+      if(r.stage==='ROUND_OF_16')  return u.includes('LAST_16')||u.includes('ROUND_OF_16');
+      if(r.stage==='QUARTER_FINALS')return u.includes('QUARTER');
+      if(r.stage==='SEMI_FINALS')  return u.includes('SEMI')&&!u.includes('FINAL');
+      if(r.stage==='FINAL')        return u==='FINAL';
+      return false;
+    }).sort((a,b)=>new Date(a.utcDate)-new Date(b.utcDate));
+
+    html+=`<div class="bracket-round"><div class="bracket-round-title">${r.title}</div><div class="bracket-matches">`;
+
+    const items=ms.length?ms:Array(r.slots).fill(null);
+    items.forEach((m,i)=>{
+      const argIn = m?isArg(m):(r.title==='1/16 Final'&&(i===10||i===11));
+      const isFin = r.stage==='FINAL';
+      if(m){
+        const hn=homeName(m),an=awayName(m),sc=getScore(m);
+        const hsc=usingAPI?m.score?.fullTime?.home:m.scoreH;
+        const asc=usingAPI?m.score?.fullTime?.away:m.scoreA;
+        const hWin=m.status==='FINISHED'&&hsc>asc;
+        const aWin=m.status==='FINISHED'&&asc>hsc;
+        const argIsHome=usingAPI?m.homeTeam?.id===ARG_ID:(m.home==='Argentina'||m.home?.includes('Argentina'));
+        html+=`<div class="bracket-match ${argIn?'arg-path':''} ${isFin?'final-match':''}">
+          <div class="bracket-team ${hWin?'winner':''} ${argIsHome&&argIn?'arg-team':''}">${f(hn)} ${hn} ${hsc!=null?`<span style="font-family:'Bebas Neue';color:var(--gold)">${hsc}</span>`:''}
+          </div>
+          <div class="bracket-team ${aWin?'winner':''} ${!argIsHome&&argIn?'arg-team':''}">${f(an)} ${an} ${asc!=null?`<span style="font-family:'Bebas Neue';color:var(--gold)">${asc}</span>`:''}
+          </div>
+        </div>`;
+      } else {
+        html+=`<div class="bracket-match ${argIn?'arg-path':''} ${isFin?'final-match':''}">
+          <div class="bracket-team ${argIn&&i===10?'arg-team':'tbd'}">${argIn&&i===10?'🇦🇷 Argentina':'Por confirmar'}</div>
+          <div class="bracket-team ${argIn&&i===11?'arg-team':'tbd'}">${argIn&&i===11?'🇦🇷 Argentina':'Por confirmar'}</div>
+        </div>`;
+      }
+    });
+    html+=`</div></div>`;
+  });
+  document.getElementById('bracketDiv').innerHTML=html;
+}
+
+// ════════════════════════════════════════════════════
+// COUNTDOWN + CLOCK
+// ════════════════════════════════════════════════════
+// Default countdown target: Argentina vs Algeria
+window._cdTarget = new Date('2026-06-17T01:00:00Z'); // 03:00 CEST
+
+function updateCountdown(){
+  if(!window._cdTarget) return;
+  const now=new Date();
+  let diff=Math.max(0,window._cdTarget-now);
+  const d=Math.floor(diff/86400000); diff-=d*86400000;
+  const h=Math.floor(diff/3600000);  diff-=h*3600000;
+  const mn=Math.floor(diff/60000);   diff-=mn*60000;
+  const s=Math.floor(diff/1000);
+  document.getElementById('cd-d').textContent=pad(d);
+  document.getElementById('cd-h').textContent=pad(h);
+  document.getElementById('cd-m').textContent=pad(mn);
+  document.getElementById('cd-s').textContent=pad(s);
+}
+
+function updateClock(){
+  const t=madridFmt(new Date(),{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('clockMadrid').textContent=t+' CEST';
+}
+
+// ════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+// Render immediately with static data while API loads
+usingAPI=false; STANDINGS=null;
+renderAll();
+setLastUpdate();
+// Then load API
+loadData(false);
+// Clock + countdown every second
+setInterval(updateClock,1000);
+setInterval(updateCountdown,1000);
+// Auto-refresh every 3 minutes
+setInterval(()=>loadData(true), 3*60*1000);
+</script>
+
+
+</body></html>
