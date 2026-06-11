@@ -602,6 +602,28 @@ function apiName(team){
   if(!team) return '?';
   return (team.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim()||team.tla||'?';
 }
+// Traducción nombres API (inglés) -> nombres usados en datos estáticos (español)
+const ES_NAME={
+  'Argentina':'Argentina','Algeria':'Argelia','Austria':'Austria','Jordan':'Jordania',
+  'Spain':'España','Uruguay':'Uruguay','Saudi Arabia':'Arabia Saudita','Cape Verde':'Cabo Verde',
+  'Mexico':'México','South Korea':'Corea del Sur','Korea Republic':'Corea del Sur',
+  'South Africa':'Sudáfrica','Czechia':'Rep. Checa','Czech Republic':'Rep. Checa',
+  'Canada':'Canadá','Qatar':'Qatar','Switzerland':'Suiza',
+  'Bosnia and Herzegovina':'Bosnia-Herzegovina','Bosnia-Herzegovina':'Bosnia-Herzegovina',
+  'Brazil':'Brasil','Morocco':'Marruecos','Scotland':'Escocia','Haiti':'Haití',
+  'United States':'Estados Unidos','USA':'Estados Unidos','Paraguay':'Paraguay','Australia':'Australia',
+  'Türkiye':'Turquía','Turkey':'Turquía','Germany':'Alemania',
+  "Côte d'Ivoire":'Costa de Marfil','Ivory Coast':'Costa de Marfil','Ecuador':'Ecuador','Curaçao':'Curazao',
+  'Netherlands':'Países Bajos','Japan':'Japón','Sweden':'Suecia','Tunisia':'Túnez',
+  'Belgium':'Bélgica','Egypt':'Egipto','Iran':'Irán','Islamic Republic of Iran':'Irán','New Zealand':'Nueva Zelanda',
+  'France':'Francia','Senegal':'Senegal','Norway':'Noruega','Iraq':'Iraq',
+  'Portugal':'Portugal','Colombia':'Colombia','Uzbekistan':'Uzbekistán','DR Congo':'RD Congo',
+  'England':'Inglaterra','Croatia':'Croacia','Ghana':'Ghana','Panama':'Panamá',
+};
+function esName(team){
+  const raw=apiName(team);
+  return ES_NAME[raw]||raw;
+}
 
 // ═══════════════════════════════════════════════
 // STATE
@@ -646,6 +668,7 @@ function fi(name){
 // — CALENDAR —
 function renderCalendar(){
   const src=apiMatches||MATCHES;
+  const now=new Date();
   const sorted=[...src].sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
   let html='',lastDay='';
   sorted.forEach(m=>{
@@ -657,8 +680,8 @@ function renderCalendar(){
     }
     let hn,an,isArg,isEsp,score=null,st='upcoming';
     if(apiMatches){
-      hn=`${apiFlag(m.homeTeam)} ${apiName(m.homeTeam)}`;
-      an=`${apiFlag(m.awayTeam)} ${apiName(m.awayTeam)}`;
+      hn=`${apiFlag(m.homeTeam)} ${esName(m.homeTeam)}`;
+      an=`${apiFlag(m.awayTeam)} ${esName(m.awayTeam)}`;
       isArg=m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
       isEsp=m.homeTeam?.id===ESP_ID||m.awayTeam?.id===ESP_ID;
       if(m.status==='FINISHED'||m.status==='IN_PLAY'||m.status==='PAUSED'){
@@ -669,6 +692,22 @@ function renderCalendar(){
       }
       if(m.status==='FINISHED') st='played';
       else if(m.status==='IN_PLAY'||m.status==='PAUSED') st='live';
+      // Fallback: si la API aún no marcó el partido como terminado pero ya pasó hace rato,
+      // usar el resultado de los datos estáticos (la API gratuita retrasa el estado/marcador)
+      if(st==='upcoming'){
+        const kickoff=new Date(m.utcDate);
+        const hoursSince=(now-kickoff)/3600000;
+        if(hoursSince>2.5){
+          const esH=esName(m.homeTeam), esA=esName(m.awayTeam);
+          const sm=MATCHES.find(x=>{
+            if(x.sh==null) return false;
+            const xh=x.h.replace(/<[^>]+>/g,'').trim();
+            const xa=x.a.replace(/<[^>]+>/g,'').trim();
+            return xh===esH && xa===esA;
+          });
+          if(sm){ score=`${sm.sh} - ${sm.sa}`; st='played'; }
+        }
+      }
     } else {
       hn=fi(m.h); an=fi(m.a);
       isArg=!!m.arg; isEsp=!!m.esp;
@@ -799,8 +838,8 @@ function renderBracket(){
       if(m){
         let hn,an,isA,hsc=null,asc=null;
         if(apiMatches){
-          hn=`${apiFlag(m.homeTeam)} ${apiName(m.homeTeam)}`;
-          an=`${apiFlag(m.awayTeam)} ${apiName(m.awayTeam)}`;
+          hn=`${apiFlag(m.homeTeam)} ${esName(m.homeTeam)}`;
+          an=`${apiFlag(m.awayTeam)} ${esName(m.awayTeam)}`;
           isA=m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
           hsc=m.score?.fullTime?.home; asc=m.score?.fullTime?.away;
         } else {
@@ -881,8 +920,8 @@ function renderHero(){
   hist.innerHTML=argMs.map(m=>{
     let hn,an,st,score=null;
     if(apiMatches){
-      hn=`${apiFlag(m.homeTeam)} ${apiName(m.homeTeam)}`;
-      an=`${apiFlag(m.awayTeam)} ${apiName(m.awayTeam)}`;
+      hn=`${apiFlag(m.homeTeam)} ${esName(m.homeTeam)}`;
+      an=`${apiFlag(m.awayTeam)} ${esName(m.awayTeam)}`;
       st=m.status==='FINISHED'?'played':m.status==='IN_PLAY'||m.status==='PAUSED'?'live':'upcoming';
       if(m.score?.fullTime?.home!=null) score=`${m.score.fullTime.home} - ${m.score.fullTime.away}`;
     } else { hn=m.h; an=m.a; st=m.st||'upcoming'; if(m.sh!=null) score=`${m.sh} - ${m.sa}`; }
