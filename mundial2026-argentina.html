@@ -662,8 +662,10 @@ function renderCalendar(){
       isArg=m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
       isEsp=m.homeTeam?.id===ESP_ID||m.awayTeam?.id===ESP_ID;
       if(m.status==='FINISHED'||m.status==='IN_PLAY'||m.status==='PAUSED'){
-        const sh=m.score?.fullTime?.home,sa=m.score?.fullTime?.away;
-        if(sh!=null) score=`${sh} - ${sa}`;
+        let sh=m.score?.fullTime?.home, sa=m.score?.fullTime?.away;
+        if(sh==null||sa==null){ sh=m.score?.home; sa=m.score?.away; }
+        if(sh==null||sa==null){ sh=m.homeTeam?.score; sa=m.awayTeam?.score; }
+        if(sh!=null&&sa!=null) score=`${sh} - ${sa}`;
       }
       if(m.status==='FINISHED') st='played';
       else if(m.status==='IN_PLAY'||m.status==='PAUSED') st='live';
@@ -676,7 +678,15 @@ function renderCalendar(){
     const loc=m.loc||m.local||'';
     const venue=m.v||m.venue||'';
     const group=m.g||m.group||'';
-    const tv=m.tv||'DAZN';
+    let tv;
+    if(apiMatches){
+      const matchDate=(m.utcDate||'').slice(0,10);
+      // Argentina vs Austria (22 jun) confirmado en RTVE
+      const argAustria = isArg && matchDate==='2026-06-22';
+      tv = (isEsp || argAustria) ? 'DAZN / La 1 (RTVE)' : 'DAZN';
+    } else {
+      tv = m.tv||'DAZN';
+    }
     let badge='';
     if(st==='live') badge='<span class="sb2 s-live">🔴 EN VIVO</span>';
     else if(st==='played') badge='<span class="sb2 s-done">✅ Jugado</span>';
