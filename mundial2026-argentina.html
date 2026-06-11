@@ -311,7 +311,8 @@ body{background:var(--bg-deep);color:var(--text);font-family:'Barlow',sans-serif
 <footer class="footer">
   <div>⚽ <strong>Mundial FIFA 2026</strong> — Dashboard en tiempo real para aficionados argentinos en Madrid</div>
   <div>📡 Datos en vivo: <a href="https://football-data.org" target="_blank">football-data.org API v4</a> · Fallback: datos estáticos FIFA 2026</div>
-  <div>📺 <strong>TV España:</strong> DAZN (104 partidos) · La 1/Teledeporte RTVE (España, semis, final) · Movistar+ (vía DAZN)</div>
+  <div>📺 <strong>TV España:</strong> DAZN emite los 104 partidos (confirmado). La 1/RTVE Play emite TODOS los partidos de España + una selección adicional de partidos por jornada (inauguración, semis, 3er puesto y final confirmados; el resto se anuncia semana a semana).</div>
+  <div style="color:var(--text-dim)">⚠️ La columna TV del calendario muestra DAZN como mínimo garantizado. Si RTVE añade un partido de Argentina u otro a su selección, se anunciará por separado — consulta <a href="https://www.rtve.es/play/" target="_blank">RTVE Play</a> cerca de la fecha.</div>
   <div style="color:var(--text-dim)">Horarios Europa/Madrid CEST (UTC+2) · Auto-refresco cada 3 min</div>
 </footer>
 
@@ -321,44 +322,44 @@ body{background:var(--bg-deep);color:var(--text);font-family:'Barlow',sans-serif
 // ═══════════════════════════════════════════════
 const MATCHES = [
  // GRUPO A
- {u:'2026-06-11T19:00:00Z',loc:'15:00 ET',h:'México',a:'Sudáfrica',v:'Estadio Azteca',c:'Ciudad de México',g:'Grupo A',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-11T19:00:00Z',loc:'15:00 ET',h:'México',a:'Sudáfrica',v:'Estadio Azteca',c:'Ciudad de México',g:'Grupo A',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-12T02:00:00Z',loc:'22:00 ET',h:'Corea del Sur',a:'Rep. Checa',v:'Estadio Akron',c:'Guadalajara',g:'Grupo A',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-18T16:00:00Z',loc:'12:00 ET',h:'Rep. Checa',a:'Sudáfrica',v:'Mercedes-Benz Stadium',c:'Atlanta',g:'Grupo A',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-19T01:00:00Z',loc:'21:00 ET',h:'México',a:'Corea del Sur',v:'Estadio Akron',c:'Guadalajara',g:'Grupo A',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-25T01:00:00Z',loc:'21:00 ET',h:'Rep. Checa',a:'México',v:'Estadio Azteca',c:'Ciudad de México',g:'Grupo A',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-25T01:00:00Z',loc:'21:00 ET',h:'Sudáfrica',a:'Corea del Sur',v:'Estadio BBVA',c:'Monterrey',g:'Grupo A',s:'GROUP_STAGE',tv:'DAZN'},
  // GRUPO B
- {u:'2026-06-12T19:00:00Z',loc:'15:00 ET',h:'Canadá',a:'Bosnia-Herzegovina',v:'BMO Field',c:'Toronto',g:'Grupo B',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-12T19:00:00Z',loc:'15:00 ET',h:'Canadá',a:'Bosnia-Herzegovina',v:'BMO Field',c:'Toronto',g:'Grupo B',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-13T19:00:00Z',loc:'15:00 ET',h:'Qatar',a:'Suiza',v:"Levi's Stadium",c:'Santa Clara',g:'Grupo B',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-18T19:00:00Z',loc:'15:00 ET',h:'Suiza',a:'Bosnia-Herzegovina',v:'SoFi Stadium',c:'Inglewood/Los Ángeles',g:'Grupo B',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-18T19:00:00Z',loc:'15:00 ET',h:'Suiza',a:'Bosnia-Herzegovina',v:'SoFi Stadium',c:'Inglewood/Los Ángeles',g:'Grupo B',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-18T22:00:00Z',loc:'18:00 ET',h:'Canadá',a:'Qatar',v:'BC Place',c:'Vancouver',g:'Grupo B',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-24T19:00:00Z',loc:'15:00 ET',h:'Suiza',a:'Canadá',v:'BC Place',c:'Vancouver',g:'Grupo B',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-24T19:00:00Z',loc:'15:00 ET',h:'Bosnia-Herzegovina',a:'Qatar',v:'Lumen Field',c:'Seattle',g:'Grupo B',s:'GROUP_STAGE',tv:'DAZN'},
  // GRUPO C
- {u:'2026-06-13T22:00:00Z',loc:'18:00 ET',h:'Brasil',a:'Marruecos',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Grupo C',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-13T22:00:00Z',loc:'18:00 ET',h:'Brasil',a:'Marruecos',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Grupo C',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-14T01:00:00Z',loc:'21:00 ET',h:'Haití',a:'Escocia',v:'Gillette Stadium',c:'Foxborough/Boston',g:'Grupo C',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-19T22:00:00Z',loc:'18:00 ET',h:'Escocia',a:'Marruecos',v:'Gillette Stadium',c:'Foxborough/Boston',g:'Grupo C',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-20T00:30:00Z',loc:'20:30 ET',h:'Brasil',a:'Haití',v:'Lincoln Financial Field',c:'Filadelfia',g:'Grupo C',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-24T22:00:00Z',loc:'18:00 ET',h:'Escocia',a:'Brasil',v:'Hard Rock Stadium',c:'Miami Gardens',g:'Grupo C',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-24T22:00:00Z',loc:'18:00 ET',h:'Escocia',a:'Brasil',v:'Hard Rock Stadium',c:'Miami Gardens',g:'Grupo C',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-24T22:00:00Z',loc:'18:00 ET',h:'Marruecos',a:'Haití',v:'Mercedes-Benz Stadium',c:'Atlanta',g:'Grupo C',s:'GROUP_STAGE',tv:'DAZN'},
  // GRUPO D
  {u:'2026-06-14T16:00:00Z',loc:'12:00 ET',h:'Australia',a:'Turquía',v:'BC Place',c:'Vancouver',g:'Grupo D',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-12T01:00:00Z',loc:'21:00 ET',h:'Estados Unidos',a:'Paraguay',v:'SoFi Stadium',c:'Inglewood/Los Ángeles',g:'Grupo D',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-19T19:00:00Z',loc:'15:00 ET',h:'Estados Unidos',a:'Australia',v:'Lumen Field',c:'Seattle',g:'Grupo D',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-19T19:00:00Z',loc:'15:00 ET',h:'Estados Unidos',a:'Australia',v:'Lumen Field',c:'Seattle',g:'Grupo D',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-20T03:00:00Z',loc:'23:00 ET',h:'Turquía',a:'Paraguay',v:"Levi's Stadium",c:'Santa Clara',g:'Grupo D',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-26T02:00:00Z',loc:'22:00 ET',h:'Turquía',a:'Estados Unidos',v:'SoFi Stadium',c:'Inglewood/Los Ángeles',g:'Grupo D',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-26T02:00:00Z',loc:'22:00 ET',h:'Paraguay',a:'Australia',v:"Levi's Stadium",c:'Santa Clara',g:'Grupo D',s:'GROUP_STAGE',tv:'DAZN'},
  // GRUPO E
- {u:'2026-06-14T17:00:00Z',loc:'13:00 ET',h:'Alemania',a:'Curazao',v:'NRG Stadium',c:'Houston',g:'Grupo E',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-14T17:00:00Z',loc:'13:00 ET',h:'Alemania',a:'Curazao',v:'NRG Stadium',c:'Houston',g:'Grupo E',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-14T23:00:00Z',loc:'19:00 ET',h:'Costa de Marfil',a:'Ecuador',v:'Lincoln Financial Field',c:'Filadelfia',g:'Grupo E',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-20T20:00:00Z',loc:'16:00 ET',h:'Alemania',a:'Costa de Marfil',v:'BMO Field',c:'Toronto',g:'Grupo E',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-21T00:00:00Z',loc:'20:00 ET',h:'Ecuador',a:'Curazao',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo E',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-25T20:00:00Z',loc:'16:00 ET',h:'Costa de Marfil',a:'Curazao',v:'Lincoln Financial Field',c:'Filadelfia',g:'Grupo E',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-25T20:00:00Z',loc:'16:00 ET',h:'Ecuador',a:'Alemania',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Grupo E',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-25T20:00:00Z',loc:'16:00 ET',h:'Ecuador',a:'Alemania',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Grupo E',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  // GRUPO F — Suecia reemplaza a Ucrania
  {u:'2026-06-14T20:00:00Z',loc:'16:00 ET',h:'Países Bajos',a:'Japón',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo F',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-15T02:00:00Z',loc:'22:00 ET',h:'Suecia',a:'Túnez',v:'Estadio BBVA',c:'Monterrey',g:'Grupo F',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-20T17:00:00Z',loc:'13:00 ET',h:'Países Bajos',a:'Suecia',v:'NRG Stadium',c:'Houston',g:'Grupo F',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-20T17:00:00Z',loc:'13:00 ET',h:'Países Bajos',a:'Suecia',v:'NRG Stadium',c:'Houston',g:'Grupo F',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-21T04:00:00Z',loc:'00:00 ET',h:'Túnez',a:'Japón',v:'Estadio BBVA',c:'Monterrey',g:'Grupo F',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-25T23:00:00Z',loc:'19:00 ET',h:'Japón',a:'Suecia',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo F',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-25T23:00:00Z',loc:'19:00 ET',h:'Túnez',a:'Países Bajos',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo F',s:'GROUP_STAGE',tv:'DAZN'},
@@ -377,30 +378,30 @@ const MATCHES = [
  {u:'2026-06-27T00:00:00Z',loc:'20:00 ET',h:'Cabo Verde',a:'Arabia Saudita',v:'NRG Stadium',c:'Houston',g:'Grupo H',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-27T00:00:00Z',loc:'20:00 ET',h:'Uruguay',a:'España',v:'Estadio Akron',c:'Guadalajara',g:'Grupo H',s:'GROUP_STAGE',tv:'La 1 (RTVE) / DAZN',esp:true},
  // GRUPO I
- {u:'2026-06-16T19:00:00Z',loc:'15:00 ET',h:'Francia',a:'Senegal',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-16T19:00:00Z',loc:'15:00 ET',h:'Francia',a:'Senegal',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-16T22:00:00Z',loc:'18:00 ET',h:'Iraq',a:'Noruega',v:'Gillette Stadium',c:'Foxborough/Boston',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-22T21:00:00Z',loc:'17:00 ET',h:'Francia',a:'Iraq',v:'Lincoln Financial Field',c:'Filadelfia',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-23T00:00:00Z',loc:'20:00 ET',h:'Noruega',a:'Senegal',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-26T19:00:00Z',loc:'15:00 ET',h:'Noruega',a:'Francia',v:'Gillette Stadium',c:'Foxborough/Boston',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-26T19:00:00Z',loc:'15:00 ET',h:'Senegal',a:'Iraq',v:'BMO Field',c:'Toronto',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN'},
  // GRUPO J — ARGENTINA ★
- {u:'2026-06-17T01:00:00Z',loc:'21:00 ET',h:'Argentina',a:'Argelia',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {u:'2026-06-17T01:00:00Z',loc:'21:00 ET',h:'Argentina',a:'Argelia',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN',arg:true},
  {u:'2026-06-17T04:00:00Z',loc:'00:00 ET',h:'Austria',a:'Jordania',v:"Levi's Stadium",c:'Santa Clara',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-22T17:00:00Z',loc:'13:00 ET',h:'Argentina',a:'Austria',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)',arg:true},
  {u:'2026-06-23T03:00:00Z',loc:'23:00 ET',h:'Jordania',a:'Argelia',v:"Levi's Stadium",c:'Santa Clara',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-28T02:00:00Z',loc:'22:00 ET',h:'Argelia',a:'Austria',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-28T02:00:00Z',loc:'22:00 ET',h:'Jordania',a:'Argentina',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {u:'2026-06-28T02:00:00Z',loc:'22:00 ET',h:'Jordania',a:'Argentina',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN',arg:true},
  // GRUPO K
  {u:'2026-06-17T17:00:00Z',loc:'13:00 ET',h:'Portugal',a:'RD Congo',v:'NRG Stadium',c:'Houston',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-18T02:00:00Z',loc:'22:00 ET',h:'Uzbekistán',a:'Colombia',v:'Estadio Azteca',c:'Ciudad de México',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-23T17:00:00Z',loc:'13:00 ET',h:'Portugal',a:'Uzbekistán',v:'NRG Stadium',c:'Houston',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-24T02:00:00Z',loc:'22:00 ET',h:'Colombia',a:'RD Congo',v:'Estadio Akron',c:'Guadalajara',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-27T23:30:00Z',loc:'19:30 ET',h:'Colombia',a:'Portugal',v:'Hard Rock Stadium',c:'Miami Gardens',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-27T23:30:00Z',loc:'19:30 ET',h:'Colombia',a:'Portugal',v:'Hard Rock Stadium',c:'Miami Gardens',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-27T23:30:00Z',loc:'19:30 ET',h:'RD Congo',a:'Uzbekistán',v:'Mercedes-Benz Stadium',c:'Atlanta',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN'},
  // GRUPO L
- {u:'2026-06-17T20:00:00Z',loc:'16:00 ET',h:'Inglaterra',a:'Croacia',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo L',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-17T20:00:00Z',loc:'16:00 ET',h:'Inglaterra',a:'Croacia',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo L',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-17T23:00:00Z',loc:'19:00 ET',h:'Ghana',a:'Panamá',v:'BMO Field',c:'Toronto',g:'Grupo L',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-23T20:00:00Z',loc:'16:00 ET',h:'Inglaterra',a:'Ghana',v:'Gillette Stadium',c:'Foxborough/Boston',g:'Grupo L',s:'GROUP_STAGE',tv:'DAZN'},
+ {u:'2026-06-23T20:00:00Z',loc:'16:00 ET',h:'Inglaterra',a:'Ghana',v:'Gillette Stadium',c:'Foxborough/Boston',g:'Grupo L',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)'},
  {u:'2026-06-23T23:00:00Z',loc:'19:00 ET',h:'Panamá',a:'Croacia',v:'BMO Field',c:'Toronto',g:'Grupo L',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-27T21:00:00Z',loc:'17:00 ET',h:'Panamá',a:'Inglaterra',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Grupo L',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-27T21:00:00Z',loc:'17:00 ET',h:'Croacia',a:'Ghana',v:'Lincoln Financial Field',c:'Filadelfia',g:'Grupo L',s:'GROUP_STAGE',tv:'DAZN'},
@@ -415,21 +416,21 @@ const MATCHES = [
  {u:'2026-07-01T16:00:00Z',loc:'12:00 ET',h:'1º Grupo L',a:'3º E/H/I/J/K',v:'Mercedes-Benz Stadium',c:'Atlanta',g:'1/16 Final',s:'LAST_32',tv:'DAZN'},
  {u:'2026-07-01T20:00:00Z',loc:'16:00 ET',h:'1º Grupo G',a:'3º A/E/H/I/J',v:'Lumen Field',c:'Seattle',g:'1/16 Final',s:'LAST_32',tv:'DAZN'},
  {u:'2026-07-02T00:00:00Z',loc:'20:00 ET',h:'1º Grupo D',a:'3º B/E/F/I/J',v:"Levi's Stadium",c:'Santa Clara',g:'1/16 Final',s:'LAST_32',tv:'DAZN'},
- {u:'2026-07-02T19:00:00Z',loc:'15:00 ET',h:'1º Grupo H',a:'2º Grupo J',v:'SoFi Stadium',c:'Inglewood/Los Ángeles',g:'1/16 Final',s:'LAST_32',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {u:'2026-07-02T19:00:00Z',loc:'15:00 ET',h:'1º Grupo H',a:'2º Grupo J',v:'SoFi Stadium',c:'Inglewood/Los Ángeles',g:'1/16 Final',s:'LAST_32',tv:'DAZN',arg:true},
  {u:'2026-07-02T23:00:00Z',loc:'19:00 ET',h:'2º Grupo K',a:'2º Grupo L',v:'BMO Field',c:'Toronto',g:'1/16 Final',s:'LAST_32',tv:'DAZN'},
  {u:'2026-07-03T03:00:00Z',loc:'23:00 ET',h:'2º Grupo B',a:'3º E/F/G/I/J',v:'BC Place',c:'Vancouver',g:'1/16 Final',s:'LAST_32',tv:'DAZN'},
  {u:'2026-07-03T18:00:00Z',loc:'14:00 ET',h:'2º Grupo D',a:'2º Grupo G',v:'AT&T Stadium',c:'Arlington/Dallas',g:'1/16 Final',s:'LAST_32',tv:'DAZN'},
- {u:'2026-07-03T22:00:00Z',loc:'18:00 ET',h:'1º Grupo J',a:'2º Grupo H',v:'Hard Rock Stadium',c:'Miami Gardens',g:'1/16 Final',s:'LAST_32',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {u:'2026-07-03T22:00:00Z',loc:'18:00 ET',h:'1º Grupo J',a:'2º Grupo H',v:'Hard Rock Stadium',c:'Miami Gardens',g:'1/16 Final',s:'LAST_32',tv:'DAZN',arg:true},
  {u:'2026-07-04T01:30:00Z',loc:'21:30 ET',h:'1º Grupo K',a:'3º D/E/I/J/L',v:'Arrowhead Stadium',c:'Kansas City',g:'1/16 Final',s:'LAST_32',tv:'DAZN'},
  // OCTAVOS (Round of 16)
- {u:'2026-07-04T17:00:00Z',loc:'13:00 ET',h:'G. Octavos 1',a:'G. Octavos 2',v:'NRG Stadium',c:'Houston',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
- {u:'2026-07-04T21:00:00Z',loc:'17:00 ET',h:'G. Octavos 3',a:'G. Octavos 4',v:'Lincoln Financial Field',c:'Filadelfia',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
- {u:'2026-07-05T20:00:00Z',loc:'16:00 ET',h:'G. Octavos 5',a:'G. Octavos 6',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
- {u:'2026-07-06T01:00:00Z',loc:'21:00 ET',h:'G. Octavos 7',a:'G. Octavos 8',v:'Estadio Azteca',c:'Ciudad de México',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
- {u:'2026-07-06T19:00:00Z',loc:'15:00 ET',h:'G. Octavos 9',a:'G. Octavos 10',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)',arg:true},
- {u:'2026-07-07T00:00:00Z',loc:'20:00 ET',h:'G. Octavos 11',a:'G. Octavos 12',v:'Lumen Field',c:'Seattle',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
- {u:'2026-07-07T16:00:00Z',loc:'12:00 ET',h:'G. Octavos 13',a:'G. Octavos 14',v:'Mercedes-Benz Stadium',c:'Atlanta',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
- {u:'2026-07-07T20:00:00Z',loc:'16:00 ET',h:'G. Octavos 15',a:'G. Octavos 16',v:'BC Place',c:'Vancouver',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN / La 1 (RTVE)'},
+ {u:'2026-07-04T17:00:00Z',loc:'13:00 ET',h:'G. Octavos 1',a:'G. Octavos 2',v:'NRG Stadium',c:'Houston',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN'},
+ {u:'2026-07-04T21:00:00Z',loc:'17:00 ET',h:'G. Octavos 3',a:'G. Octavos 4',v:'Lincoln Financial Field',c:'Filadelfia',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN'},
+ {u:'2026-07-05T20:00:00Z',loc:'16:00 ET',h:'G. Octavos 5',a:'G. Octavos 6',v:'MetLife Stadium',c:'East Rutherford, NJ',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN'},
+ {u:'2026-07-06T01:00:00Z',loc:'21:00 ET',h:'G. Octavos 7',a:'G. Octavos 8',v:'Estadio Azteca',c:'Ciudad de México',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN'},
+ {u:'2026-07-06T19:00:00Z',loc:'15:00 ET',h:'G. Octavos 9',a:'G. Octavos 10',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN',arg:true},
+ {u:'2026-07-07T00:00:00Z',loc:'20:00 ET',h:'G. Octavos 11',a:'G. Octavos 12',v:'Lumen Field',c:'Seattle',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN'},
+ {u:'2026-07-07T16:00:00Z',loc:'12:00 ET',h:'G. Octavos 13',a:'G. Octavos 14',v:'Mercedes-Benz Stadium',c:'Atlanta',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN'},
+ {u:'2026-07-07T20:00:00Z',loc:'16:00 ET',h:'G. Octavos 15',a:'G. Octavos 16',v:'BC Place',c:'Vancouver',g:'Octavos de Final',s:'ROUND_OF_16',tv:'DAZN'},
  // CUARTOS
  {u:'2026-07-09T20:00:00Z',loc:'16:00 ET',h:'G. Cuartos A',a:'G. Cuartos B',v:'Gillette Stadium',c:'Foxborough/Boston',g:'Cuartos de Final',s:'QUARTER_FINALS',tv:'La 1 (RTVE) / DAZN'},
  {u:'2026-07-10T19:00:00Z',loc:'15:00 ET',h:'G. Cuartos C',a:'G. Cuartos D',v:'SoFi Stadium',c:'Inglewood/Los Ángeles',g:'Cuartos de Final',s:'QUARTER_FINALS',tv:'La 1 (RTVE) / DAZN'},
@@ -890,9 +891,10 @@ function renderHero(){
 async function loadData(silent=false){
   if(!silent) document.getElementById('lov').classList.remove('h');
   try{
+    const proxy='https://corsproxy.io/?url=';
     const [mr,sr]=await Promise.all([
-      fetch(`${API_BASE}/competitions/WC/matches`,{headers:{'X-Auth-Token':API_KEY}}),
-      fetch(`${API_BASE}/competitions/WC/standings`,{headers:{'X-Auth-Token':API_KEY}}).catch(()=>null)
+      fetch(proxy+encodeURIComponent(`${API_BASE}/competitions/WC/matches`),{headers:{'X-Auth-Token':API_KEY}}),
+      fetch(proxy+encodeURIComponent(`${API_BASE}/competitions/WC/standings`),{headers:{'X-Auth-Token':API_KEY}}).catch(()=>null)
     ]);
     if(!mr.ok) throw new Error(mr.status);
     const md=await mr.json();
