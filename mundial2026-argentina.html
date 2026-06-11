@@ -905,6 +905,7 @@ async function loadData(silent=false){
     document.getElementById('abadge').textContent='⬤ API en vivo';
     document.getElementById('abadge').className='apib api-ok';
   }catch(e){
+    console.error('Error API Mundial 2026:', e);
     apiMatches=null; apiStandings=null;
     document.getElementById('abadge').textContent='⬤ Datos estáticos';
     document.getElementById('abadge').className='apib api-no';
