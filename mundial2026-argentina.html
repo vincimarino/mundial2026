@@ -826,12 +826,41 @@ function getApiTeam(id){
 }
 
 function showTeam(label, apiId){
+  // 1. Buscar por ID en API
   if(apiId && apiMatches){
     const t = getApiTeam(apiId);
     if(t && t.name && t.name.trim() && t.name!=='TBD'){
       return apiFlag(t)+' '+esName(t);
     }
   }
+  // 2. Buscar en API por fecha del partido estático con ese label
+  if(label && apiMatches){
+    // Mapa label corto -> label largo en datos estáticos
+    const LABEL_MAP = {
+      '2A':'2º Grupo A','2B':'2º Grupo B','1C':'1º Grupo C','2F':'2º Grupo F',
+      '1E':'1º Grupo E','1F':'1º Grupo F','2C':'2º Grupo C','2E':'2º Grupo E',
+      '2I':'2º Grupo I','1I':'1º Grupo I','1A':'1º Grupo A','1L':'1º Grupo L',
+      '1G':'1º Grupo G','1D':'1º Grupo D','1H':'1º Grupo H','2J':'2º Grupo J',
+      '2K':'2º Grupo K','2L':'2º Grupo L','1B':'1º Grupo B','2D':'2º Grupo D',
+      '2G':'2º Grupo G','1J':'1º Grupo J','2H':'2º Grupo H','1K':'1º Grupo K',
+    };
+    const longLabel = LABEL_MAP[label];
+    if(longLabel){
+      const sm = MATCHES.find(m=>m.s==='LAST_32'&&(m.h===longLabel||m.a===longLabel));
+      if(sm){
+        const apiM = apiMatches.find(am=>am.utcDate&&sm.u&&
+          Math.abs(new Date(am.utcDate)-new Date(sm.u)) < 4*3600000);
+        if(apiM){
+          const isHome = sm.h===longLabel;
+          const t = isHome ? apiM.homeTeam : apiM.awayTeam;
+          if(t && t.name && t.name.trim() && t.name!=='TBD' && t.id){
+            return apiFlag(t)+' '+esName(t);
+          }
+        }
+      }
+    }
+  }
+  // 3. Mostrar label FIFA
   if(!label) return '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
   const isThird = label.startsWith('3');
   return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:'+(isThird?'var(--gold-dim)':'var(--gold)')+'">'+label+'</b>';
