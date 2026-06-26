@@ -830,7 +830,17 @@ function getBySt(src,st){
   }).sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
 }
 
-function mkCard(m, isArgSlot, isFinal){
+// Convierte "1º Grupo C" → "1C", "2º Grupo F" → "2F", "3º A/B/C/D/F" → "3ABCDF"
+function compactSlot(name){
+  if(!name) return name;
+  // "1º Grupo X" or "2º Grupo X"
+  let m = name.match(/^([12])º Grupo ([A-L])$/);
+  if(m) return `<span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gold)">${m[1]}${m[2]}</span>`;
+  // "3º A/B/C/D/E" 
+  m = name.match(/^3º ([A-L\/]+)$/);
+  if(m) return `<span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gold-dim)">3${m[1].replace(/\//g,'')}</span>`;
+  return name;
+}
   let hn,an,isA=isArgSlot,hsc=null,asc=null,dateStr='';
   if(m){
     if(apiMatches){
@@ -841,10 +851,10 @@ function mkCard(m, isArgSlot, isFinal){
     } else {
       const rawH=m.h||''; const rawA=m.a||'';
       // fi() only for real team names, not placeholders
-      const isPlaceholderH=rawH.startsWith('G.')||rawH.includes('Ganador')||rawH.includes('Perdedor')||rawH.includes('Octavos')||rawH.includes('Cuartos')||rawH.includes('Semi')||rawH.includes('Por confirmar');
-      const isPlaceholderA=rawA.startsWith('G.')||rawA.includes('Ganador')||rawA.includes('Perdedor')||rawA.includes('Octavos')||rawA.includes('Cuartos')||rawA.includes('Semi')||rawA.includes('Por confirmar');
-      hn=isPlaceholderH?rawH:fi(rawH)||rawH;
-      an=isPlaceholderA?rawA:fi(rawA)||rawA;
+      const isPlaceholderH=rawH.startsWith('G.')||rawH.includes('Ganador')||rawH.includes('Perdedor')||rawH.includes('Octavos')||rawH.includes('Cuartos')||rawH.includes('Semi')||rawH.includes('Por confirmar')||rawH.match(/^[12]º Grupo/)||rawH.match(/^3º /);
+      const isPlaceholderA=rawA.startsWith('G.')||rawA.includes('Ganador')||rawA.includes('Perdedor')||rawA.includes('Octavos')||rawA.includes('Cuartos')||rawA.includes('Semi')||rawA.includes('Por confirmar')||rawA.match(/^[12]º Grupo/)||rawA.match(/^3º /);
+      hn=isPlaceholderH?(compactSlot(rawH)||rawH):fi(rawH)||rawH;
+      an=isPlaceholderA?(compactSlot(rawA)||rawA):fi(rawA)||rawA;
       isA=!!m.arg;
     }
     const dt=new Date(m.utcDate||m.u);
