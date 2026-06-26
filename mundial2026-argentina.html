@@ -176,7 +176,7 @@ body{background:var(--bg-deep);color:var(--text);font-family:'Barlow',sans-serif
 </head>
 <body>
 
-<div class="load-ov" id="lov">
+<div class="load-ov h" id="lov">
   <div class="spin"></div>
   <div class="lt">Cargando datos</div>
   <div class="ls" id="lsub">Conectando con football-data.org...</div>
@@ -575,7 +575,7 @@ const TMAP={
 };
 function flagImg(code){
   if(!code) return '';
-  return ``;
+  return '<img src="https://flagcdn.com/20x15/'+code+'.png" width="20" height="15" style="vertical-align:middle;margin-right:4px;border-radius:2px">';
 }
 const IMGMAP={
   'Argentina':'ar','Algeria':'dz','Austria':'at','Jordan':'jo','Spain':'es','Uruguay':'uy',
@@ -637,6 +637,7 @@ function esName(team){
 const API_KEY='e1c0d6055eed4bd8bb3ce7fb78c25fd5';
 const API_BASE='https://api.football-data.org/v4';
 const ARG_ID=762, ESP_ID=760;
+window._cdt = new Date('2026-06-17T01:00:00Z'); // Argentina vs Argelia por defecto
 let apiMatches=null, apiStandings=null;
 window._cdt=new Date('2026-06-17T01:00:00Z');
 
@@ -736,28 +737,23 @@ function renderCalendar(){
     if(st==='live') badge='<span class="sb2 s-live">🔴 EN VIVO</span>';
     else if(st==='played') badge='<span class="sb2 s-done">✅ Jugado</span>';
     else badge='<span class="sb2 s-next">⏳ Próximo</span>';
-    html+=`<div class="mr ${isArg?'am':''} ${isEsp?'em':''}">
-      <div class="mdt">
-        <div class="md">${fmtD(dt)}</div>
-        <div class="mt">${fmtT(dt)} <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>
-        ${loc?`<div class="ml2">(${loc})</div>`:''}
-      </div>
-      <div class="mb">
-        <div class="mtr">
-          <span>${hn}</span>
-          ${score?`<span class="msi">${score}</span>`:'<span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>'}
-          <span>${an}</span>
-          ${isArg?'<span class="pill pb">ARG</span>':''}
-          ${isEsp?'<span class="pill pr">ESP</span>':''}
-        </div>
-        <div class="mm">
-          ${venue?`<span class="tg">🏟️ ${venue}</span>`:''}
-          <span class="tg">${group}</span>
-          <span class="tg tv">📺 ${tv}</span>
-        </div>
-      </div>
-      <div class="ms">${badge}<span class="mpt">${phLbl(m.s||m.stage)}</span></div>
-    </div>`;
+    const locHtml = loc ? '<div class="ml2">('+loc+')</div>' : '';
+    const scoreHtml = score ? '<span class="msi">'+score+'</span>' : '<span style="color:var(--text-dim);font-size:0.8rem;padding:0 4px">vs</span>';
+    const venueHtml = venue ? '<span class="tg">🏟️ '+venue+'</span>' : '';
+    const argPill = isArg ? '<span class="pill pb">ARG</span>' : '';
+    const espPill = isEsp ? '<span class="pill pr">ESP</span>' : '';
+    html += '<div class="mr '+(isArg?'am':'')+' '+(isEsp?'em':'')+'">'+
+      '<div class="mdt">'+
+        '<div class="md">'+fmtD(dt)+'</div>'+
+        '<div class="mt">'+fmtT(dt)+' <span style="font-size:0.65rem;color:var(--gold-dim)">CEST</span></div>'+
+        locHtml+
+      '</div>'+
+      '<div class="mb">'+
+        '<div class="mtr"><span>'+hn+'</span>'+scoreHtml+'<span>'+an+'</span>'+argPill+espPill+'</div>'+
+        '<div class="mm">'+venueHtml+'<span class="tg">'+group+'</span><span class="tg tv">📺 '+tv+'</span></div>'+
+      '</div>'+
+      '<div class="ms">'+badge+'<span class="mpt">'+phLbl(m.s||m.stage)+'</span></div>'+
+    '</div>';
   });
   document.getElementById('mlist').innerHTML=html;
 }
@@ -793,28 +789,30 @@ function renderGroups(){
 }
 
 function buildGroup(lbl,teams,hasArg,hasEsp){
-  return `<div class="gc ${hasArg?'ag':''} ${hasEsp&&!hasArg?'eg':''}">
-    <div class="gh">${lbl}
-      ${hasArg?'<span style="font-size:0.7rem;color:var(--celeste)">⭐ Argentina</span>':''}
-      ${hasEsp&&!hasArg?'<span style="font-size:0.7rem;color:#ff8080">España</span>':''}
-    </div>
-    <table class="gt">
-      <thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
-      <tbody>${teams.map((t,i)=>{
-        const isA=t.id===ARG_ID||(t.n||'').includes('Argentina')||(t.n||'').includes('Argentina');
-        const isE=t.id===ESP_ID||(t.n||'').includes('España')||(t.n||'').includes('Spain');
-        const dg=(t.gf||0)-(t.gc||0);
-        return `<tr class="${isA?'ar':''} ${isE?'er':''} ${t.q?'q':''} ${t.el?'el':''}">
-          <td>${i+1}</td>
-          <td class="tn">${fi(t.n)}</td>
-          <td>${t.pj}</td><td>${t.g}</td><td>${t.e}</td><td>${t.p}</td>
-          <td>${t.gf}</td><td>${t.gc}</td>
-          <td>${dg>=0?'+'+dg:dg}</td>
-          <td class="pts">${t.pts}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>
-  </div>`;
+  const headerBadge = hasArg ? '<span style="font-size:0.7rem;color:var(--celeste)">⭐ Argentina</span>' :
+                      (hasEsp&&!hasArg ? '<span style="font-size:0.7rem;color:#ff8080">España</span>' : '');
+  let rows = '';
+  teams.forEach((t,i)=>{
+    const isA=t.id===ARG_ID||(t.n||'').includes('Argentina');
+    const isE=t.id===ESP_ID||(t.n||'').includes('España')||(t.n||'').includes('Spain');
+    const dg=(t.gf||0)-(t.gc||0);
+    const cls=(isA?'ar ':'')+( isE?'er ':'')+( t.q?'q ':'')+( t.el?'el':'');
+    rows+='<tr class="'+cls+'">'+
+      '<td>'+(i+1)+'</td>'+
+      '<td class="tn">'+(t.f||fi(t.n))+'</td>'+
+      '<td>'+t.pj+'</td><td>'+t.g+'</td><td>'+t.e+'</td><td>'+t.p+'</td>'+
+      '<td>'+t.gf+'</td><td>'+t.gc+'</td>'+
+      '<td>'+(dg>=0?'+'+dg:dg)+'</td>'+
+      '<td class="pts">'+t.pts+'</td>'+
+    '</tr>';
+  });
+  return '<div class="gc '+(hasArg?'ag':'')+' '+(hasEsp&&!hasArg?'eg':'')+'">'+
+    '<div class="gh">'+lbl+headerBadge+'</div>'+
+    '<table class="gt">'+
+      '<thead><tr><th>#</th><th>Selección</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table>'+
+  '</div>';
 }
 
 // — BRACKET —
@@ -830,6 +828,22 @@ function getBySt(src,st){
   }).sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
 }
 
+// Convierte "1º Grupo C" → "1C", "2º Grupo F" → "2F", "3º A/B/C/D/F" → "3ABCDF"
+function compactSlot(name){
+  if(!name) return name;
+  // "1º Grupo X" → "1X"
+  let m = name.match(/^([12])º Grupo ([A-L])$/);
+  if(m) return '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:1rem;color:var(--gold)">'+m[1]+m[2]+'</span>';
+  // "3º A/B/C/D/E" → "3ABCDE"
+  m = name.match(/^3º ([A-L\/]+)$/);
+  if(m) return '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:1rem;color:var(--gold-dim)">3'+m[1].replace(/\//g,'')+'</span>';
+  // "G. Semi A", "G. Octavos 1", "Ganador Semi A", "Perdedor Semi B" etc → show as-is in muted style
+  if(name.startsWith('G.')||name.includes('Ganador')||name.includes('Perdedor')||
+     name.includes('Octavos')||name.includes('Cuartos')||name.includes('Semi')){
+    return '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">'+name+'</span>';
+  }
+  return name;
+}
 function mkCard(m, isArgSlot, isFinal){
   let hn,an,isA=isArgSlot,hsc=null,asc=null,dateStr='';
   if(m){
@@ -841,10 +855,13 @@ function mkCard(m, isArgSlot, isFinal){
     } else {
       const rawH=m.h||''; const rawA=m.a||'';
       // fi() only for real team names, not placeholders
-      const isPlaceholderH=rawH.startsWith('G.')||rawH.includes('Ganador')||rawH.includes('Perdedor')||rawH.includes('Octavos')||rawH.includes('Cuartos')||rawH.includes('Semi')||rawH.includes('Por confirmar');
-      const isPlaceholderA=rawA.startsWith('G.')||rawA.includes('Ganador')||rawA.includes('Perdedor')||rawA.includes('Octavos')||rawA.includes('Cuartos')||rawA.includes('Semi')||rawA.includes('Por confirmar');
-      hn=isPlaceholderH?rawH:fi(rawH)||rawH;
-      an=isPlaceholderA?rawA:fi(rawA)||rawA;
+      const isPlaceholderH=rawH.startsWith('G.')||rawH.includes('Ganador')||rawH.includes('Perdedor')||rawH.includes('Octavos')||rawH.includes('Cuartos')||rawH.includes('Semi')||rawH.includes('Por confirmar')||rawH.match(/^[12]º Grupo/)||rawH.match(/^3º /);
+      const isPlaceholderA=rawA.startsWith('G.')||rawA.includes('Ganador')||rawA.includes('Perdedor')||rawA.includes('Octavos')||rawA.includes('Cuartos')||rawA.includes('Semi')||rawA.includes('Por confirmar')||rawA.match(/^[12]º Grupo/)||rawA.match(/^3º /);
+      hn=isPlaceholderH?(compactSlot(rawH)||rawH):fi(rawH)||rawH;
+      an=isPlaceholderA?(compactSlot(rawA)||rawA):fi(rawA)||rawA;
+      // For Argentina slot in 1/16
+      if(rawH==='🇦🇷 Argentina (si 1ª J)'||rawH==='🇦🇷 Argentina (si 2ª J)') hn=fi('Argentina')+' Argentina';
+      if(rawA==='🇦🇷 Argentina (si 1ª J)'||rawA==='🇦🇷 Argentina (si 2ª J)') an=fi('Argentina')+' Argentina';
       isA=!!m.arg;
     }
     const dt=new Date(m.utcDate||m.u);
@@ -859,11 +876,16 @@ function mkCard(m, isArgSlot, isFinal){
   // For placeholder team names (G. Semi A, G. Cuartos B etc), show as tbd style
   const hTbd = !hsc && (hn.startsWith('G.')||hn.includes('Ganador')||hn.includes('Perdedor')||hn.includes('Por confirmar'));
   const aTbd = !asc && (an.startsWith('G.')||an.includes('Ganador')||an.includes('Perdedor')||an.includes('Por confirmar'));
-  return `<div class="bm ${isA?'ap':''} ${isFinal?'fp':''}">
-    ${dateStr?`<div class="bm-date">📅 ${dateStr}</div>`:''}
-    <div class="bt ${hW?'w':''} ${argH||(!m&&isArgSlot)?'at':''} ${hTbd?'tbd':''}">${hn}${hsc!=null?` <b style="color:var(--gold);font-family:Bebas Neue">${hsc}</b>`:''}</div>
-    <div class="bt ${aW?'w':''} ${argA?'at':''} ${aTbd||(!m&&!isArgSlot)?'tbd':''}">${an}${asc!=null?` <b style="color:var(--gold);font-family:Bebas Neue">${asc}</b>`:''}</div>
-  </div>`;
+  const dateHtml = dateStr ? '<div class="bm-date">📅 '+dateStr+'</div>' : '';
+  const hScoreHtml = hsc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+hsc+'</b>' : '';
+  const aScoreHtml = asc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+asc+'</b>' : '';
+  const hCls = 'bt'+(hW?' w':'')+(argH||(!m&&isArgSlot)?' at':'')+(hTbd?' tbd':'');
+  const aCls = 'bt'+(aW?' w':'')+(argA?' at':'')+(aTbd||(!m&&!isArgSlot)?' tbd':'');
+  const bmCls = 'bm'+(isA?' ap':'')+(isFinal?' fp':'');
+  return '<div class="'+bmCls+'">'+dateHtml+
+    '<div class="'+hCls+'">'+hn+hScoreHtml+'</div>'+
+    '<div class="'+aCls+'">'+an+aScoreHtml+'</div>'+
+  '</div>';
 }
 
 function mkCol(title, matches, total, argSlots=[]){
@@ -871,10 +893,7 @@ function mkCol(title, matches, total, argSlots=[]){
   for(let i=0;i<total;i++){
     cards+=mkCard(matches[i]||null, argSlots.includes(i), false);
   }
-  return `<div class="brk-col">
-    <div class="brk-col-title">${title}</div>
-    <div class="brk-slots">${cards}</div>
-  </div>`;
+  return '<div class="brk-col"><div class="brk-col-title">'+title+'</div><div class="brk-slots">'+cards+'</div></div>';
 }
 
 function renderBracket(){
@@ -1060,11 +1079,18 @@ function swTab(id,btn){
 }
 
 // INIT — render static immediately, then try API
-renderAll();
-document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
-setInterval(tick,1000); tick();
-loadData(true);
-setInterval(()=>loadData(true),3*60*1000);
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    renderAll();
+    document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
+    setInterval(tick,1000); tick();
+  } catch(e){ console.error('Init error:', e); }
+  // Force hide loading after 5 seconds no matter what
+  setTimeout(()=>document.getElementById('lov').classList.add('h'), 3000);
+  // Try API in background
+  setTimeout(()=>loadData(true), 500);
+  setInterval(()=>loadData(true),3*60*1000);
+});
 </script>
 </body>
 </html>
