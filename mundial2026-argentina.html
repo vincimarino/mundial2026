@@ -828,59 +828,95 @@ function getBySt(src,st){
   }).sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
 }
 
-// Convierte "1º Grupo C" → "1C", "2º Grupo F" → "2F", "3º A/B/C/D/F" → "3ABCDF"
-function compactSlot(name){
-  if(!name) return name;
-  // "1º Grupo X" → "1X"
-  let m = name.match(/^([12])º Grupo ([A-L])$/);
-  if(m) return '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:1rem;color:var(--gold)">'+m[1]+m[2]+'</span>';
-  // "3º A/B/C/D/E" → "3ABCDE"
-  m = name.match(/^3º ([A-L\/]+)$/);
-  if(m) return '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:1rem;color:var(--gold-dim)">3'+m[1].replace(/\//g,'')+'</span>';
-  // "G. Semi A", "G. Octavos 1", "Ganador Semi A", "Perdedor Semi B" etc → show as-is in muted style
-  if(name.startsWith('G.')||name.includes('Ganador')||name.includes('Perdedor')||
-     name.includes('Octavos')||name.includes('Cuartos')||name.includes('Semi')){
-    return '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">'+name+'</span>';
-  }
-  return name;
+// Slot labels for 1/16 (official FIFA bracket order)
+const SLOT_LABELS = [
+  ['2A','2B'],['1C','2F'],['1E','3ABCDF'],['1F','2C'],
+  ['2E','2I'],['1I','3CDFGH'],['1A','3CEFHI'],['1L','3EHIJK'],
+  ['1H','2J'],['2K','2L'],['2B','3EFGIJ'],['2D','2G'],
+  ['1J','2H'],['1K','3DEIJL'],['1G','3AEHIJ'],['1D','3BEFIJ']
+];
+
+function slotLabel(idx){
+  if(idx<0||idx>=SLOT_LABELS.length) return ['?','?'];
+  return SLOT_LABELS[idx];
 }
-function mkCard(m, isArgSlot, isFinal){
+
+function teamDisplay(team, staticName, slotIdx, isHome){
+  // If we have a real team name from API, use it
+  if(team && team.name && team.name.trim() && team.name!=='null'){
+    const clean = (team.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
+    if(clean) return apiFlag(team)+' '+esName(team);
+  }
+  // If static data has a real team name (not placeholder), use it
+  if(staticName){
+    const isPh = staticName.startsWith('G.')||staticName.includes('Ganador')||
+                 staticName.includes('Perdedor')||staticName.match(/^[12]º Grupo/)||
+                 staticName.match(/^3º /)||staticName.includes('Por confirmar')||
+                 staticName.includes('Octavos')||staticName.includes('Cuartos')||
+                 staticName.includes('Semi');
+    if(!isPh) return fi(staticName)||staticName;
+    // For 1/16 placeholders, return compact slot
+    const m1 = staticName.match(/^([12])º Grupo ([A-L])$/);
+    if(m1) return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">'+m1[1]+m1[2]+'</b>';
+    const m2 = staticName.match(/^3º ([A-L\/]+)$/);
+    if(m2) return '<b style="font-family:Bebas Neue,sans-serif;font-size:1rem;color:var(--gold-dim)">3'+m2[1].replace(/\//g,'')+'</b>';
+  }
+  // Fallback: use bracket slot label
+  if(slotIdx>=0){
+    const labels = slotLabel(slotIdx);
+    const lbl = isHome ? labels[0] : labels[1];
+    return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">'+lbl+'</b>';
+  }
+  return '<span style="color:var(--text-dim);font-style:italic">Por confirmar</span>';
+}
+
+function mkCard(m, slotIdx, isArgSlot, isFinal){
   let hn,an,isA=isArgSlot,hsc=null,asc=null,dateStr='';
   if(m){
+    const dt = new Date(m.utcDate||m.u);
+    dateStr = fmtD(dt)+' · '+fmtT(dt)+' CEST';
     if(apiMatches){
-      hn=`${apiFlag(m.homeTeam)} ${esName(m.homeTeam)}`;
-      an=`${apiFlag(m.awayTeam)} ${esName(m.awayTeam)}`;
-      isA=m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
-      hsc=m.score?.fullTime?.home; asc=m.score?.fullTime?.away;
+      hn = teamDisplay(m.homeTeam, null, slotIdx, true);
+      an = teamDisplay(m.awayTeam, null, slotIdx, false);
+      isA = m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
+      hsc = m.score?.fullTime?.home;
+      asc = m.score?.fullTime?.away;
+      // Fallback: if API score missing but match is old, check static
+      if(hsc==null && (new Date()-dt)/3600000 > 2.5){
+        const sm = MATCHES.find(x=>{
+          if(x.sh==null) return false;
+          const xh = x.h.replace(/<[^>]+>/g,'').trim();
+          const xa = x.a.replace(/<[^>]+>/g,'').trim();
+          const eh = esName(m.homeTeam), ea = esName(m.awayTeam);
+          return xh===eh && xa===ea;
+        });
+        if(sm){ hsc=sm.sh; asc=sm.sa; }
+      }
     } else {
-      const rawH=m.h||''; const rawA=m.a||'';
-      // fi() only for real team names, not placeholders
-      const isPlaceholderH=rawH.startsWith('G.')||rawH.includes('Ganador')||rawH.includes('Perdedor')||rawH.includes('Octavos')||rawH.includes('Cuartos')||rawH.includes('Semi')||rawH.includes('Por confirmar')||rawH.match(/^[12]º Grupo/)||rawH.match(/^3º /);
-      const isPlaceholderA=rawA.startsWith('G.')||rawA.includes('Ganador')||rawA.includes('Perdedor')||rawA.includes('Octavos')||rawA.includes('Cuartos')||rawA.includes('Semi')||rawA.includes('Por confirmar')||rawA.match(/^[12]º Grupo/)||rawA.match(/^3º /);
-      hn=isPlaceholderH?(compactSlot(rawH)||rawH):fi(rawH)||rawH;
-      an=isPlaceholderA?(compactSlot(rawA)||rawA):fi(rawA)||rawA;
-      // For Argentina slot in 1/16
-      if(rawH==='🇦🇷 Argentina (si 1ª J)'||rawH==='🇦🇷 Argentina (si 2ª J)') hn=fi('Argentina')+' Argentina';
-      if(rawA==='🇦🇷 Argentina (si 1ª J)'||rawA==='🇦🇷 Argentina (si 2ª J)') an=fi('Argentina')+' Argentina';
-      isA=!!m.arg;
+      hn = teamDisplay(null, m.h, slotIdx, true);
+      an = teamDisplay(null, m.a, slotIdx, false);
+      isA = !!m.arg;
+      if(m.sh!=null){ hsc=m.sh; asc=m.sa; }
     }
-    const dt=new Date(m.utcDate||m.u);
-    dateStr=fmtD(dt)+' · '+fmtT(dt)+' CEST';
   } else {
-    hn=isArgSlot?fi('Argentina'):'Por confirmar';
-    an='Por confirmar';
+    // No match at all - show slot label
+    if(slotIdx>=0){
+      const labels = slotLabel(slotIdx);
+      hn = '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">'+labels[0]+'</b>';
+      an = '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">'+labels[1]+'</b>';
+    } else {
+      hn = '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
+      an = '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
+    }
   }
-  const hW=hsc!=null&&hsc>asc, aW=asc!=null&&asc>hsc;
-  const argH=isA&&hn.includes('Argentina');
-  const argA=isA&&an.includes('Argentina');
-  // For placeholder team names (G. Semi A, G. Cuartos B etc), show as tbd style
-  const hTbd = !hsc && (hn.startsWith('G.')||hn.includes('Ganador')||hn.includes('Perdedor')||hn.includes('Por confirmar'));
-  const aTbd = !asc && (an.startsWith('G.')||an.includes('Ganador')||an.includes('Perdedor')||an.includes('Por confirmar'));
+  const hW = hsc!=null&&hsc>asc, aW = asc!=null&&asc>hsc;
+  const argH = isA && (hn.includes('Argentina'));
+  const argA = isA && (an.includes('Argentina'));
   const dateHtml = dateStr ? '<div class="bm-date">📅 '+dateStr+'</div>' : '';
   const hScoreHtml = hsc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+hsc+'</b>' : '';
   const aScoreHtml = asc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+asc+'</b>' : '';
-  const hCls = 'bt'+(hW?' w':'')+(argH||(!m&&isArgSlot)?' at':'')+(hTbd?' tbd':'');
-  const aCls = 'bt'+(aW?' w':'')+(argA?' at':'')+(aTbd||(!m&&!isArgSlot)?' tbd':'');
+  const hCls = 'bt'+(hW?' w':'')+(argH||(!m&&isArgSlot)?' at':'');
+  const aCls = 'bt'+(aW?' w':'')+(argA?' at':'');
   const bmCls = 'bm'+(isA?' ap':'')+(isFinal?' fp':'');
   return '<div class="'+bmCls+'">'+dateHtml+
     '<div class="'+hCls+'">'+hn+hScoreHtml+'</div>'+
@@ -888,68 +924,64 @@ function mkCard(m, isArgSlot, isFinal){
   '</div>';
 }
 
-function mkCol(title, matches, total, argSlots=[]){
+function mkCol(title, matches, total, startSlot, argSlots){
   let cards='';
   for(let i=0;i<total;i++){
-    cards+=mkCard(matches[i]||null, argSlots.includes(i), false);
+    const slotIdx = startSlot>=0 ? startSlot+i : -1;
+    const isArgSlot = argSlots ? argSlots.includes(i) : false;
+    cards += mkCard(matches[i]||null, slotIdx, isArgSlot, false);
   }
   return '<div class="brk-col"><div class="brk-col-title">'+title+'</div><div class="brk-slots">'+cards+'</div></div>';
 }
 
 function renderBracket(){
-  const src=apiMatches||MATCHES;
-  const r16=getBySt(src,'LAST_32');    // 16 matches
-  const r8 =getBySt(src,'ROUND_OF_16'); // 8 matches
-  const r4 =getBySt(src,'QUARTER_FINALS'); // 4 matches
-  const r2 =getBySt(src,'SEMI_FINALS');  // 2 matches
-  const fin=getBySt(src,'FINAL');        // 1 match
-
-  // Left side (slots 0-7 of r16, 0-3 of r8, 0-1 of r4, 0 of r2)
-  // Right side (slots 8-15 of r16, 4-7 of r8, 2-3 of r4, 1 of r2)
-  // Argentina expected in right side r16 slots 10-11 = index 2-3 of right
+  const src = apiMatches||MATCHES;
+  const r16 = getBySt(src,'LAST_32');
+  const r8  = getBySt(src,'ROUND_OF_16');
+  const r4  = getBySt(src,'QUARTER_FINALS');
+  const r2  = getBySt(src,'SEMI_FINALS');
+  const fin = getBySt(src,'FINAL');
 
   const L16=r16.slice(0,8), R16=r16.slice(8);
-  const L8 =r8.slice(0,4),  R8 =r8.slice(4);
-  const L4 =r4.slice(0,2),  R4 =r4.slice(2);
-  const L2 =r2.slice(0,1),  R2 =r2.slice(1);
+  const L8=r8.slice(0,4),   R8=r8.slice(4);
+  const L4=r4.slice(0,2),   R4=r4.slice(2);
+  const L2=r2.slice(0,1),   R2=r2.slice(1);
 
-  // Argentina is in right side 1/16, positions 2 and 3 (slots 10 and 11 overall)
-  const argR16=[2,3];
+  // Argentina slots: right side 1/16, positions 4 (slot 12=1J/2H) and 0 (slot 8=1H/2J)
+  const argSlotsR = [0,4]; // indices in R16 array
 
-  const finalCard = fin[0]
-    ? mkCard(fin[0],false,true)
-    : `<div class="bm fp">
-        <div class="bm-date">📅 Dom 19 Jul · 21:00 CEST</div>
-        <div class="bt tbd">Ganador Semi A</div>
-        <div class="bt tbd">Ganador Semi B</div>
-       </div>`;
+  const finalCard = fin[0] ? mkCard(fin[0],-1,false,true) :
+    '<div class="bm fp"><div class="bm-date">📅 Dom 19 Jul · 21:00 CEST</div>'+
+    '<div class="bt tbd">Ganador Semi A</div>'+
+    '<div class="bt tbd">Ganador Semi B</div></div>';
 
-  const thirdCard = `<div class="bm" style="border-color:rgba(255,215,0,0.3)">
-    <div class="bm-date">📅 Vie 18 Jul · 23:00 CEST</div>
-    <div class="bt tbd">Perdedor Semi A</div>
-    <div class="bt tbd">Perdedor Semi B</div>
-  </div>`;
+  const thirdCard =
+    '<div class="bm" style="border-color:rgba(255,215,0,0.3)">'+
+    '<div class="bm-date">📅 Vie 18 Jul · 23:00 CEST</div>'+
+    '<div class="bt tbd">Perdedor Semi A</div>'+
+    '<div class="bt tbd">Perdedor Semi B</div></div>';
 
-  document.getElementById('brk').innerHTML=`
-  <div class="brk-wrap">
-    <!-- LEFT: 1/16 → Octavos → Cuartos → Semis -->
-    ${mkCol('1/16 Final',L16,8)}
-    ${mkCol('Octavos',L8,4)}
-    ${mkCol('Cuartos',L4,2)}
-    ${mkCol('Semis',L2,1)}
-    <!-- CENTER: Final + 3er puesto -->
-    <div class="brk-center">
-      <div class="brk-center-title">⭐ FINAL</div>
-      ${finalCard}
-      <div style="margin-top:16px;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--text-muted);text-align:center">3er Puesto</div>
-      ${thirdCard}
-    </div>
-    <!-- RIGHT: Semis → Cuartos → Octavos → 1/16 -->
-    ${mkCol('Semis',R2,1)}
-    ${mkCol('Cuartos',R4,2)}
-    ${mkCol('Octavos',R8,4)}
-    ${mkCol('1/16 Final',R16,8,argR16)}
-  </div>`;
+  // Static semi dates for when API has no team names yet
+  const semiL = MATCHES.find(m=>m.s==='SEMI_FINALS');
+  const semiR = MATCHES.filter(m=>m.s==='SEMI_FINALS')[1];
+
+  document.getElementById('brk').innerHTML =
+    '<div class="brk-wrap">'+
+    mkCol('1/16 Final',L16,8,0,null)+
+    mkCol('Octavos',L8,4,-1,null)+
+    mkCol('Cuartos',L4,2,-1,null)+
+    mkCol('Semis',L2,1,-1,null)+
+    '<div class="brk-center">'+
+      '<div class="brk-center-title">⭐ FINAL</div>'+
+      finalCard+
+      '<div style="margin-top:14px;font-family:Bebas Neue,sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--text-muted);text-align:center">3er Puesto</div>'+
+      thirdCard+
+    '</div>'+
+    mkCol('Semis',R2,1,-1,null)+
+    mkCol('Cuartos',R4,2,-1,null)+
+    mkCol('Octavos',R8,4,-1,null)+
+    mkCol('1/16 Final',R16,8,8,argSlotsR)+
+    '</div>';
 }
 
 // — HERO —
