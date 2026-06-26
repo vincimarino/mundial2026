@@ -1048,31 +1048,50 @@ function renderHero(){
 // API LOAD
 // ═══════════════════════════════════════════════
 async function loadData(silent=false){
-  if(!silent) document.getElementById('lov').classList.remove('h');
-  try{
-    const proxy='https://corsproxy.io/?url=';
-    const [mr,sr]=await Promise.all([
-      fetch(proxy+encodeURIComponent(`${API_BASE}/competitions/WC/matches`),{headers:{'X-Auth-Token':API_KEY}}),
-      fetch(proxy+encodeURIComponent(`${API_BASE}/competitions/WC/standings`),{headers:{'X-Auth-Token':API_KEY}}).catch(()=>null)
-    ]);
-    if(!mr.ok) throw new Error(mr.status);
-    const md=await mr.json();
-    if(md.matches?.length){ apiMatches=md.matches; }
-    if(sr?.ok){
-      const sd=await sr.json();
-      apiStandings={};
-      (sd.standings||[]).forEach(g=>{apiStandings[g.group||g.stage]=g.table||[];});
+  const PROXIES = [
+    'https://corsproxy.io/?url=',
+    'https://api.allorigins.win/raw?url=',
+    'https://cors-anywhere.herokuapp.com/',
+    '', // intento directo sin proxy
+  ];
+
+  let loaded = false;
+  for(const proxy of PROXIES){
+    try{
+      const url1 = proxy ? proxy+encodeURIComponent(`${API_BASE}/competitions/WC/matches`) : `${API_BASE}/competitions/WC/matches`;
+      const url2 = proxy ? proxy+encodeURIComponent(`${API_BASE}/competitions/WC/standings`) : `${API_BASE}/competitions/WC/standings`;
+      const [mr,sr] = await Promise.all([
+        fetch(url1,{headers:{'X-Auth-Token':API_KEY},signal:AbortSignal.timeout(8000)}),
+        fetch(url2,{headers:{'X-Auth-Token':API_KEY},signal:AbortSignal.timeout(8000)}).catch(()=>null)
+      ]);
+      if(!mr.ok) throw new Error(mr.status);
+      const md = await mr.json();
+      if(md.matches?.length){
+        apiMatches = md.matches;
+        if(sr?.ok){
+          const sd = await sr.json();
+          apiStandings = {};
+          (sd.standings||[]).forEach(g=>{apiStandings[g.group||g.stage]=g.table||[];});
+        }
+        document.getElementById('abadge').textContent='⬤ API en vivo';
+        document.getElementById('abadge').className='apib api-ok';
+        document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
+        renderAll();
+        loaded = true;
+        break;
+      }
+    }catch(e){
+      console.warn('Proxy falló, intentando siguiente...', proxy, e.message);
     }
-    document.getElementById('abadge').textContent='⬤ API en vivo';
-    document.getElementById('abadge').className='apib api-ok';
-  }catch(e){
-    console.error('Error API Mundial 2026:', e);
+  }
+  if(!loaded){
+    console.warn('Todos los proxies fallaron, usando datos estáticos');
     apiMatches=null; apiStandings=null;
     document.getElementById('abadge').textContent='⬤ Datos estáticos';
     document.getElementById('abadge').className='apib api-no';
+    document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
+    renderAll();
   }
-  document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
-  renderAll();
   document.getElementById('lov').classList.add('h');
 }
 
