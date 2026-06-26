@@ -176,7 +176,7 @@ body{background:var(--bg-deep);color:var(--text);font-family:'Barlow',sans-serif
 </head>
 <body>
 
-<div class="load-ov" id="lov">
+<div class="load-ov h" id="lov">
   <div class="spin"></div>
   <div class="lt">Cargando datos</div>
   <div class="ls" id="lsub">Conectando con football-data.org...</div>
@@ -637,6 +637,7 @@ function esName(team){
 const API_KEY='e1c0d6055eed4bd8bb3ce7fb78c25fd5';
 const API_BASE='https://api.football-data.org/v4';
 const ARG_ID=762, ESP_ID=760;
+window._cdt = new Date('2026-06-17T01:00:00Z'); // Argentina vs Argelia por defecto
 let apiMatches=null, apiStandings=null;
 window._cdt=new Date('2026-06-17T01:00:00Z');
 
@@ -1070,11 +1071,18 @@ function swTab(id,btn){
 }
 
 // INIT — render static immediately, then try API
-renderAll();
-document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
-setInterval(tick,1000); tick();
-loadData(true);
-setInterval(()=>loadData(true),3*60*1000);
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    renderAll();
+    document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
+    setInterval(tick,1000); tick();
+  } catch(e){ console.error('Init error:', e); }
+  // Force hide loading after 5 seconds no matter what
+  setTimeout(()=>document.getElementById('lov').classList.add('h'), 3000);
+  // Try API in background
+  setTimeout(()=>loadData(true), 500);
+  setInterval(()=>loadData(true),3*60*1000);
+});
 </script>
 </body>
 </html>
