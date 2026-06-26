@@ -147,19 +147,25 @@ body{background:var(--bg-deep);color:var(--text);font-family:'Barlow',sans-serif
 .gt tr.ar td{background:rgba(116,192,252,0.05);}
 .gt tr.er td{background:rgba(198,11,30,0.04);}
 /* BRACKET */
-.bsc{overflow-x:auto;padding-bottom:8px;}
-.br{display:flex;min-width:920px;}
-.brr{display:flex;flex-direction:column;flex:1;min-width:155px;}
-.brt{font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--gold);text-align:center;padding:6px 8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
-.brm{display:flex;flex-direction:column;gap:8px;align-items:center;}
-.bm{background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;width:148px;overflow:hidden;font-size:0.77rem;}
-.bm.ap{border-color:var(--celeste-dark);box-shadow:0 0 10px rgba(116,192,252,0.12);}
-.bm.fp{border-color:var(--gold);box-shadow:0 0 14px rgba(255,215,0,0.2);}
-.bt{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;border-bottom:1px solid rgba(255,255,255,0.05);}
+.bsc{overflow-x:auto;padding-bottom:16px;}
+.brk-wrap{display:flex;align-items:stretch;min-width:1400px;gap:0;}
+/* Each round column */
+.brk-col{display:flex;flex-direction:column;min-width:175px;}
+.brk-col-title{font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--gold);text-align:center;padding:6px 4px 8px;white-space:nowrap;}
+.brk-slots{display:flex;flex-direction:column;flex:1;justify-content:space-around;gap:6px;padding:0 4px;}
+/* Center column */
+.brk-center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:185px;padding:0 8px;}
+.brk-center-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--gold);text-align:center;margin-bottom:8px;}
+/* Match card */
+.bm{background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;width:165px;overflow:hidden;font-size:0.77rem;}
+.bm.ap{border-color:var(--celeste-dark);box-shadow:0 0 8px rgba(116,192,252,0.2);}
+.bm.fp{border-color:var(--gold);box-shadow:0 0 16px rgba(255,215,0,0.3);}
+.bm-date{font-family:'Barlow Condensed',sans-serif;font-size:0.62rem;color:var(--gold-dim);padding:3px 7px 1px;letter-spacing:0.5px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.bt{display:flex;align-items:center;justify-content:space-between;padding:5px 7px;font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;border-bottom:1px solid rgba(255,255,255,0.04);}
 .bt:last-child{border-bottom:none;}
-.bt.w{background:rgba(255,215,0,0.08);color:var(--gold);font-weight:700;}
+.bt.w{background:rgba(255,215,0,0.1);color:var(--gold);font-weight:700;}
 .bt.tbd{color:var(--text-dim);font-style:italic;font-size:0.7rem;}
-.bt.at{background:rgba(116,192,252,0.1);color:var(--celeste);font-weight:700;}
+.bt.at{background:rgba(116,192,252,0.12);color:var(--celeste);font-weight:700;}
 /* FOOTER */
 .footer{border-top:1px solid var(--border);padding:20px;text-align:center;color:var(--text-dim);font-size:0.72rem;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;line-height:1.9;margin-top:30px;}
 .footer a{color:var(--gold-dim);text-decoration:none;}
@@ -812,57 +818,119 @@ function buildGroup(lbl,teams,hasArg,hasEsp){
 }
 
 // — BRACKET —
+function getBySt(src,st){
+  return src.filter(m=>{
+    const u=(m.stage||m.s||'').toUpperCase();
+    if(st==='LAST_32') return u.includes('LAST_32');
+    if(st==='ROUND_OF_16') return u.includes('LAST_16')||u.includes('ROUND_OF_16');
+    if(st==='QUARTER_FINALS') return u.includes('QUARTER');
+    if(st==='SEMI_FINALS') return u.includes('SEMI')&&!u.includes('FINAL');
+    if(st==='FINAL') return u==='FINAL';
+    return false;
+  }).sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
+}
+
+function mkCard(m, isArgSlot, isFinal){
+  let hn,an,isA=isArgSlot,hsc=null,asc=null,dateStr='';
+  if(m){
+    if(apiMatches){
+      hn=`${apiFlag(m.homeTeam)} ${esName(m.homeTeam)}`;
+      an=`${apiFlag(m.awayTeam)} ${esName(m.awayTeam)}`;
+      isA=m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
+      hsc=m.score?.fullTime?.home; asc=m.score?.fullTime?.away;
+    } else {
+      const rawH=m.h||''; const rawA=m.a||'';
+      // fi() only for real team names, not placeholders
+      const isPlaceholderH=rawH.startsWith('G.')||rawH.includes('Ganador')||rawH.includes('Perdedor')||rawH.includes('Octavos')||rawH.includes('Cuartos')||rawH.includes('Semi')||rawH.includes('Por confirmar');
+      const isPlaceholderA=rawA.startsWith('G.')||rawA.includes('Ganador')||rawA.includes('Perdedor')||rawA.includes('Octavos')||rawA.includes('Cuartos')||rawA.includes('Semi')||rawA.includes('Por confirmar');
+      hn=isPlaceholderH?rawH:fi(rawH)||rawH;
+      an=isPlaceholderA?rawA:fi(rawA)||rawA;
+      isA=!!m.arg;
+    }
+    const dt=new Date(m.utcDate||m.u);
+    dateStr=fmtD(dt)+' · '+fmtT(dt)+' CEST';
+  } else {
+    hn=isArgSlot?fi('Argentina'):'Por confirmar';
+    an='Por confirmar';
+  }
+  const hW=hsc!=null&&hsc>asc, aW=asc!=null&&asc>hsc;
+  const argH=isA&&hn.includes('Argentina');
+  const argA=isA&&an.includes('Argentina');
+  // For placeholder team names (G. Semi A, G. Cuartos B etc), show as tbd style
+  const hTbd = !hsc && (hn.startsWith('G.')||hn.includes('Ganador')||hn.includes('Perdedor')||hn.includes('Por confirmar'));
+  const aTbd = !asc && (an.startsWith('G.')||an.includes('Ganador')||an.includes('Perdedor')||an.includes('Por confirmar'));
+  return `<div class="bm ${isA?'ap':''} ${isFinal?'fp':''}">
+    ${dateStr?`<div class="bm-date">📅 ${dateStr}</div>`:''}
+    <div class="bt ${hW?'w':''} ${argH||(!m&&isArgSlot)?'at':''} ${hTbd?'tbd':''}">${hn}${hsc!=null?` <b style="color:var(--gold);font-family:Bebas Neue">${hsc}</b>`:''}</div>
+    <div class="bt ${aW?'w':''} ${argA?'at':''} ${aTbd||(!m&&!isArgSlot)?'tbd':''}">${an}${asc!=null?` <b style="color:var(--gold);font-family:Bebas Neue">${asc}</b>`:''}</div>
+  </div>`;
+}
+
+function mkCol(title, matches, total, argSlots=[]){
+  let cards='';
+  for(let i=0;i<total;i++){
+    cards+=mkCard(matches[i]||null, argSlots.includes(i), false);
+  }
+  return `<div class="brk-col">
+    <div class="brk-col-title">${title}</div>
+    <div class="brk-slots">${cards}</div>
+  </div>`;
+}
+
 function renderBracket(){
-  const rounds=[
-    {t:'1/16 Final',st:'LAST_32',sl:16},
-    {t:'Octavos',st:'ROUND_OF_16',sl:8},
-    {t:'Cuartos',st:'QUARTER_FINALS',sl:4},
-    {t:'Semis',st:'SEMI_FINALS',sl:2},
-    {t:'FINAL ⭐',st:'FINAL',sl:1},
-  ];
   const src=apiMatches||MATCHES;
-  let html='';
-  rounds.forEach(r=>{
-    const ms=src.filter(m=>{
-      const u=(m.stage||m.s||'').toUpperCase();
-      if(r.st==='LAST_32') return u.includes('LAST_32');
-      if(r.st==='ROUND_OF_16') return u.includes('LAST_16')||u.includes('ROUND_OF_16');
-      if(r.st==='QUARTER_FINALS') return u.includes('QUARTER');
-      if(r.st==='SEMI_FINALS') return u.includes('SEMI')&&!u.includes('FINAL');
-      if(r.st==='FINAL') return u==='FINAL';
-      return false;
-    }).sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
-    html+=`<div class="brr"><div class="brt">${r.t}</div><div class="brm">`;
-    const items=ms.length?ms:Array(r.sl).fill(null);
-    items.forEach((m,i)=>{
-      if(m){
-        let hn,an,isA,hsc=null,asc=null;
-        if(apiMatches){
-          hn=`${apiFlag(m.homeTeam)} ${esName(m.homeTeam)}`;
-          an=`${apiFlag(m.awayTeam)} ${esName(m.awayTeam)}`;
-          isA=m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
-          hsc=m.score?.fullTime?.home; asc=m.score?.fullTime?.away;
-        } else {
-          hn=fi(m.h); an=fi(m.a); isA=!!m.arg;
-        }
-        const fin=r.st==='FINAL';
-        const hW=hsc!=null&&hsc>asc, aW=asc!=null&&asc>hsc;
-        html+=`<div class="bm ${isA?'ap':''} ${fin?'fp':''}">
-          <div class="bt ${hW?'w':''} ${isA&&hn.includes('Argentina')?'at':''}">${hn}${hsc!=null?` <span style="font-family:'Bebas Neue';color:var(--gold)">${hsc}</span>`:''}</div>
-          <div class="bt ${aW?'w':''} ${isA&&an.includes('Argentina')?'at':''}">${an}${asc!=null?` <span style="font-family:'Bebas Neue';color:var(--gold)">${asc}</span>`:''}</div>
-        </div>`;
-      } else {
-        const isArgSlot=r.t==='1/16 Final'&&(i===10||i===11);
-        const fin=r.st==='FINAL';
-        html+=`<div class="bm ${isArgSlot?'ap':''} ${fin?'fp':''}">
-          <div class="bt ${isArgSlot?'at':'tbd'}">${isArgSlot?'Argentina':'Por confirmar'}</div>
-          <div class="bt tbd">Por confirmar</div>
-        </div>`;
-      }
-    });
-    html+=`</div></div>`;
-  });
-  document.getElementById('brk').innerHTML=html;
+  const r16=getBySt(src,'LAST_32');    // 16 matches
+  const r8 =getBySt(src,'ROUND_OF_16'); // 8 matches
+  const r4 =getBySt(src,'QUARTER_FINALS'); // 4 matches
+  const r2 =getBySt(src,'SEMI_FINALS');  // 2 matches
+  const fin=getBySt(src,'FINAL');        // 1 match
+
+  // Left side (slots 0-7 of r16, 0-3 of r8, 0-1 of r4, 0 of r2)
+  // Right side (slots 8-15 of r16, 4-7 of r8, 2-3 of r4, 1 of r2)
+  // Argentina expected in right side r16 slots 10-11 = index 2-3 of right
+
+  const L16=r16.slice(0,8), R16=r16.slice(8);
+  const L8 =r8.slice(0,4),  R8 =r8.slice(4);
+  const L4 =r4.slice(0,2),  R4 =r4.slice(2);
+  const L2 =r2.slice(0,1),  R2 =r2.slice(1);
+
+  // Argentina is in right side 1/16, positions 2 and 3 (slots 10 and 11 overall)
+  const argR16=[2,3];
+
+  const finalCard = fin[0]
+    ? mkCard(fin[0],false,true)
+    : `<div class="bm fp">
+        <div class="bm-date">📅 Dom 19 Jul · 21:00 CEST</div>
+        <div class="bt tbd">Ganador Semi A</div>
+        <div class="bt tbd">Ganador Semi B</div>
+       </div>`;
+
+  const thirdCard = `<div class="bm" style="border-color:rgba(255,215,0,0.3)">
+    <div class="bm-date">📅 Vie 18 Jul · 23:00 CEST</div>
+    <div class="bt tbd">Perdedor Semi A</div>
+    <div class="bt tbd">Perdedor Semi B</div>
+  </div>`;
+
+  document.getElementById('brk').innerHTML=`
+  <div class="brk-wrap">
+    <!-- LEFT: 1/16 → Octavos → Cuartos → Semis -->
+    ${mkCol('1/16 Final',L16,8)}
+    ${mkCol('Octavos',L8,4)}
+    ${mkCol('Cuartos',L4,2)}
+    ${mkCol('Semis',L2,1)}
+    <!-- CENTER: Final + 3er puesto -->
+    <div class="brk-center">
+      <div class="brk-center-title">⭐ FINAL</div>
+      ${finalCard}
+      <div style="margin-top:16px;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--text-muted);text-align:center">3er Puesto</div>
+      ${thirdCard}
+    </div>
+    <!-- RIGHT: Semis → Cuartos → Octavos → 1/16 -->
+    ${mkCol('Semis',R2,1)}
+    ${mkCol('Cuartos',R4,2)}
+    ${mkCol('Octavos',R8,4)}
+    ${mkCol('1/16 Final',R16,8,argR16)}
+  </div>`;
 }
 
 // — HERO —
