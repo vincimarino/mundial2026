@@ -816,194 +816,131 @@ function buildGroup(lbl,teams,hasArg,hasEsp){
 }
 
 // — BRACKET —
-function getBySt(src,st){
-  return src.filter(m=>{
-    const u=(m.stage||m.s||'').toUpperCase();
-    if(st==='LAST_32') return u.includes('LAST_32');
-    if(st==='ROUND_OF_16') return u.includes('LAST_16')||u.includes('ROUND_OF_16');
-    if(st==='QUARTER_FINALS') return u.includes('QUARTER');
-    if(st==='SEMI_FINALS') return u.includes('SEMI')&&!u.includes('FINAL');
-    if(st==='FINAL') return u==='FINAL';
-    return false;
-  }).sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
+function getApiTeam(id){
+  if(!apiMatches||!id) return null;
+  for(const m of apiMatches){
+    if(m.homeTeam?.id===id) return m.homeTeam;
+    if(m.awayTeam?.id===id) return m.awayTeam;
+  }
+  return null;
 }
 
-// Slot labels for 1/16 — orden oficial FIFA (izquierda slots 0-7, derecha slots 8-15)
-// Fuente: FIFA.com oficial
-const SLOT_LABELS = [
-  ['2A','2B'],    // M73 - SoFi Stadium
-  ['1C','2F'],    // M74 - Houston
-  ['1E','3ABCDF'],// M75 - Boston
-  ['1F','2C'],    // M76 - Monterrey
-  ['2E','2I'],    // M77 - Dallas
-  ['1I','3CDFGH'],// M78 - MetLife NJ
-  ['1A','3CEFHI'],// M79 - Ciudad de México
-  ['1L','3EHIJK'],// M80 - Atlanta
-  ['1H','2J'],    // M81 - Miami ← Argentina si 2ª en J
-  ['2K','2L'],    // M82 - Toronto
-  ['1B','3EFGIJ'],// M83 - Vancouver
-  ['2D','2G'],    // M84 - Dallas
-  ['1J','2H'],    // M85 - Miami ← Argentina si 1ª en J
-  ['1K','3DEIJL'],// M86 - Kansas City
-  ['1G','3AEHIJ'],// M87 - Seattle
-  ['1D','3BEFIJ'] // M88 - Santa Clara
-];
-
-function slotLabel(idx){
-  if(idx<0||idx>=SLOT_LABELS.length) return ['?','?'];
-  return SLOT_LABELS[idx];
+function showTeam(label, apiId){
+  if(apiId && apiMatches){
+    const t = getApiTeam(apiId);
+    if(t && t.name && t.name.trim() && t.name!=='TBD'){
+      return apiFlag(t)+' '+esName(t);
+    }
+  }
+  if(!label) return '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
+  const isThird = label.startsWith('3');
+  return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:'+(isThird?'var(--gold-dim)':'var(--gold)')+'">'+label+'</b>';
 }
 
-function teamDisplay(team, slotName, slotIdx, isHome){
-  // 1. API has a real confirmed team with a known name
-  if(team && team.id && team.name){
-    const clean = (team.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
-    if(clean && clean!=='TBD' && clean!=='null' && clean.length>1){
-      return apiFlag(team)+' '+esName(team);
-    }
-  }
-  // 2. Use static slot label (e.g. "1º Grupo C", "3º A/B/C/D/F")
-  if(slotName){
-    const m1 = slotName.match(/^([12])º Grupo ([A-L])$/);
-    if(m1) return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.2rem;color:var(--gold)">'+m1[1]+m1[2]+'</b>';
-    const m2 = slotName.match(/^3º ([A-L\/]+)$/);
-    if(m2) return '<b style="font-family:Bebas Neue,sans-serif;font-size:1rem;color:var(--gold-dim)">3'+m2[1].replace(/\//g,'')+'</b>';
-    // Real team name in slot
-    const isPh = slotName.match(/^[12]º /)||slotName.match(/^3º /)||slotName.includes('Grupo')||
-                 slotName.includes('Ganador')||slotName.includes('Perdedor')||
-                 slotName.includes('Semi')||slotName.includes('Octavos');
-    if(!isPh) return fi(slotName)||slotName;
-  }
-  // 3. Fallback: generic label
-  return '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
+function getApiResult(hId, aId){
+  if(!apiMatches||!hId||!aId) return null;
+  return apiMatches.find(m=>
+    (m.homeTeam?.id===hId && m.awayTeam?.id===aId)||
+    (m.homeTeam?.id===aId && m.awayTeam?.id===hId)
+  )||null;
 }
 
-function mkCard(m, slotIdx, isArgSlot, isFinal){
-  let hn,an,isA=isArgSlot,hsc=null,asc=null,dateStr='';
-  if(m){
-    const dt = new Date(m.utcDate||m.u);
-    dateStr = fmtD(dt)+' · '+fmtT(dt)+' CEST';
-    if(apiMatches){
-      hn = teamDisplay(m.homeTeam, m._slotH||null, slotIdx, true);
-      an = teamDisplay(m.awayTeam, m._slotA||null, slotIdx, false);
-      isA = m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID;
-      hsc = m.score?.fullTime?.home;
-      asc = m.score?.fullTime?.away;
-      // Fallback: if API score missing but match is old, check static
-      if(hsc==null && (new Date()-dt)/3600000 > 2.5){
-        const sm = MATCHES.find(x=>{
-          if(x.sh==null) return false;
-          const xh = x.h.replace(/<[^>]+>/g,'').trim();
-          const xa = x.a.replace(/<[^>]+>/g,'').trim();
-          const eh = esName(m.homeTeam), ea = esName(m.awayTeam);
-          return xh===eh && xa===ea;
-        });
-        if(sm){ hsc=sm.sh; asc=sm.sa; }
-      }
-    } else {
-      hn = teamDisplay(null, m.h, slotIdx, true);
-      an = teamDisplay(null, m.a, slotIdx, false);
-      isA = !!m.arg;
-      if(m.sh!=null){ hsc=m.sh; asc=m.sa; }
-    }
-  } else {
-    // No match at all - show slot label
-    if(slotIdx>=0){
-      const labels = slotLabel(slotIdx);
-      hn = '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">'+labels[0]+'</b>';
-      an = '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">'+labels[1]+'</b>';
-    } else {
-      hn = '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
-      an = '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
+function bCard(date, time, hLabel, aLabel, hId, aId, isArg, isFin){
+  const hn = showTeam(hLabel, hId);
+  const an = showTeam(aLabel, aId);
+  const argH = isArg && (hId===ARG_ID || hLabel==='1J');
+  const argA = isArg && (aId===ARG_ID || aLabel==='1J');
+  let hsc=null, asc=null;
+  if(hId&&aId){
+    const apiM = getApiResult(hId,aId);
+    if(apiM&&apiM.status==='FINISHED'){
+      hsc=apiM.score?.fullTime?.home;
+      asc=apiM.score?.fullTime?.away;
     }
   }
-  const hW = hsc!=null&&hsc>asc, aW = asc!=null&&asc>hsc;
-  const argH = isA && (hn.includes('Argentina'));
-  const argA = isA && (an.includes('Argentina'));
-  const dateHtml = dateStr ? '<div class="bm-date">📅 '+dateStr+'</div>' : '';
-  const hScoreHtml = hsc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+hsc+'</b>' : '';
-  const aScoreHtml = asc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+asc+'</b>' : '';
-  const hCls = 'bt'+(hW?' w':'')+(argH||(!m&&isArgSlot)?' at':'');
-  const aCls = 'bt'+(aW?' w':'')+(argA?' at':'');
-  const bmCls = 'bm'+(isA?' ap':'')+(isFinal?' fp':'');
+  const hW=hsc!=null&&hsc>asc, aW=asc!=null&&asc>hsc;
+  const dateHtml = date ? '<div class="bm-date">'+date+' · '+time+' CEST</div>' : '';
+  const hScHtml = hsc!=null?' <b style="color:var(--gold);font-family:Bebas Neue">'+hsc+'</b>':'';
+  const aScHtml = asc!=null?' <b style="color:var(--gold);font-family:Bebas Neue">'+asc+'</b>':'';
+  const hCls='bt'+(hW?' w':'')+(argH?' at':'');
+  const aCls='bt'+(aW?' w':'')+(argA?' at':'');
+  const bmCls='bm'+(isArg?' ap':'')+(isFin?' fp':'');
   return '<div class="'+bmCls+'">'+dateHtml+
-    '<div class="'+hCls+'">'+hn+hScoreHtml+'</div>'+
-    '<div class="'+aCls+'">'+an+aScoreHtml+'</div>'+
+    '<div class="'+hCls+'">'+hn+hScHtml+'</div>'+
+    '<div class="'+aCls+'">'+an+aScHtml+'</div>'+
   '</div>';
 }
 
-function mkCol(title, matches, total, startSlot, argSlots){
-  let cards='';
-  for(let i=0;i<total;i++){
-    const slotIdx = startSlot>=0 ? startSlot+i : -1;
-    const isArgSlot = argSlots ? argSlots.includes(i) : false;
-    cards += mkCard(matches[i]||null, slotIdx, isArgSlot, false);
-  }
-  return '<div class="brk-col"><div class="brk-col-title">'+title+'</div><div class="brk-slots">'+cards+'</div></div>';
+function mkCol(title, cards){
+  return '<div class="brk-col"><div class="brk-col-title">'+title+'</div><div class="brk-slots">'+cards.join('')+'</div></div>';
 }
 
 function renderBracket(){
-  const src = apiMatches||MATCHES;
-  const r16 = getBySt(src,'LAST_32');
-  const r8  = getBySt(src,'ROUND_OF_16');
-  const r4  = getBySt(src,'QUARTER_FINALS');
-  const r2  = getBySt(src,'SEMI_FINALS');
-  const fin = getBySt(src,'FINAL');
-  // Build a map from utcDate -> static slot labels for R16
-  const staticR16 = getBySt(MATCHES,'LAST_32');
-  const slotByDate = {};
-  staticR16.forEach((sm,i)=>{
-    slotByDate[sm.u] = {h:sm.h, a:sm.a, idx:i};
-  });
+  const L16 = [
+    bCard('dom 28 jun','21:00','2A','2B',    null,null,false,false),
+    bCard('lun 29 jun','19:00','1C','2F',    null,null,false,false),
+    bCard('lun 29 jun','22:30','1E','3ABCDF',null,null,false,false),
+    bCard('mar 30 jun','03:00','1F','2C',    null,null,false,false),
+    bCard('mar 30 jun','19:00','2E','2I',    null,null,false,false),
+    bCard('mar 30 jun','23:00','1I','3CDFGH',null,null,false,false),
+    bCard('mié 01 jul','03:00','1A','3CEFHI',null,null,false,false),
+    bCard('mié 01 jul','18:00','1L','3EHIJK',null,null,false,false),
+  ];
+  const R16 = [
+    bCard('mié 01 jul','22:00','1G','3AEHIJ',null,null,false,false),
+    bCard('jue 02 jul','02:00','1D','3BEFIJ',null,null,false,false),
+    bCard('jue 02 jul','21:00','1H','2J',    null,null,true, false),
+    bCard('vie 03 jul','01:00','2K','2L',    null,null,false,false),
+    bCard('vie 03 jul','05:00','1B','3EFGIJ',null,null,false,false),
+    bCard('vie 03 jul','20:00','2D','2G',    null,null,false,false),
+    bCard('vie 03 jul','22:00','1J','2H',    ARG_ID,null,true, false),
+    bCard('sáb 04 jul','01:30','1K','3DEIJL',null,null,false,false),
+  ];
+  const L8 = [
+    bCard('sáb 05 jul','19:00','G. Octavos 1','G. Octavos 2',null,null,false,false),
+    bCard('sáb 05 jul','23:00','G. Octavos 3','G. Octavos 4',null,null,false,false),
+    bCard('dom 06 jul','22:00','G. Octavos 5','G. Octavos 6',null,null,false,false),
+    bCard('lun 07 jul','02:00','G. Octavos 7','G. Octavos 8',null,null,false,false),
+  ];
+  const R8 = [
+    bCard('lun 06 jul','21:00','G. Octavos 9','G. Octavos 10',null,null,true,false),
+    bCard('mar 07 jul','18:00','G. Octavos 11','G. Octavos 12',null,null,false,false),
+    bCard('mar 07 jul','22:00','G. Octavos 13','G. Octavos 14',null,null,false,false),
+    bCard('mar 07 jul','02:00','G. Octavos 15','G. Octavos 16',null,null,false,false),
+  ];
+  const L4 = [
+    bCard('jue 09 jul','22:00','G. Cuartos A','G. Cuartos B',null,null,false,false),
+    bCard('vie 10 jul','21:00','G. Cuartos C','G. Cuartos D',null,null,false,false),
+  ];
+  const R4 = [
+    bCard('sáb 11 jul','23:00','G. Cuartos E','G. Cuartos F',null,null,false,false),
+    bCard('dom 12 jul','03:00','G. Cuartos G','G. Cuartos H',null,null,false,false),
+  ];
+  const L2 = [bCard('lun 14 jul','21:00','G. Semi A','G. Semi B',null,null,false,false)];
+  const R2 = [bCard('mar 15 jul','21:00','G. Semi C','G. Semi D',null,null,false,false)];
 
-  // Attach static slot info to API matches so we can show labels for TBD teams
-  if(apiMatches){
-    r16.forEach(am=>{
-      const key = am.utcDate;
-      // Find closest static match by time
-      const sm = staticR16.find(s=>Math.abs(new Date(s.u)-new Date(am.utcDate))<3600000);
-      if(sm){ am._slotH=sm.h; am._slotA=sm.a; }
-    });
-  }
-  const L16=r16.slice(0,8), R16=r16.slice(8);
-  const L8=r8.slice(0,4),   R8=r8.slice(4);
-  const L4=r4.slice(0,2),   R4=r4.slice(2);
-  const L2=r2.slice(0,1),   R2=r2.slice(1);
-
-  // Argentina slots: right side 1/16, positions 4 (slot 12=1J/2H) and 0 (slot 8=1H/2J)
-  const argSlotsR = [0,4]; // indices in R16 array
-
-  const finalCard = fin[0] ? mkCard(fin[0],-1,false,true) :
-    '<div class="bm fp"><div class="bm-date">📅 Dom 19 Jul · 21:00 CEST</div>'+
-    '<div class="bt tbd">Ganador Semi A</div>'+
-    '<div class="bt tbd">Ganador Semi B</div></div>';
-
-  const thirdCard =
-    '<div class="bm" style="border-color:rgba(255,215,0,0.3)">'+
-    '<div class="bm-date">📅 Vie 18 Jul · 23:00 CEST</div>'+
+  const finalCard = bCard('dom 19 jul','21:00','Ganador Semi A','Ganador Semi B',null,null,false,true);
+  const thirdCard = '<div class="bm" style="border-color:rgba(255,215,0,0.3)">'+
+    '<div class="bm-date">Vie 18 jul · 23:00 CEST</div>'+
     '<div class="bt tbd">Perdedor Semi A</div>'+
     '<div class="bt tbd">Perdedor Semi B</div></div>';
 
-  const staticSemis = MATCHES.filter(m=>m.s==='SEMI_FINALS');
-  const L2use = L2.length ? L2 : (staticSemis[0] ? [staticSemis[0]] : []);
-  const R2use = R2.length ? R2 : (staticSemis[1] ? [staticSemis[1]] : []);
-
   document.getElementById('brk').innerHTML =
     '<div class="brk-wrap">'+
-    mkCol('1/16 Final',L16,8,0,null)+
-    mkCol('Octavos',L8,4,-1,null)+
-    mkCol('Cuartos',L4,2,-1,null)+
-    mkCol('Semis',L2use,1,-1,null)+
+    mkCol('1/16 Final',L16)+
+    mkCol('Octavos',L8)+
+    mkCol('Cuartos',L4)+
+    mkCol('Semis',L2)+
     '<div class="brk-center">'+
       '<div class="brk-center-title">⭐ FINAL</div>'+
       finalCard+
       '<div style="margin-top:14px;font-family:Bebas Neue,sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--text-muted);text-align:center">3er Puesto</div>'+
       thirdCard+
     '</div>'+
-    mkCol('Semis',R2use,1,-1,null)+
-    mkCol('Cuartos',R4,2,-1,null)+
-    mkCol('Octavos',R8,4,-1,null)+
-    mkCol('1/16 Final',R16,8,8,argSlotsR)+
+    mkCol('Semis',R2)+
+    mkCol('Cuartos',R4)+
+    mkCol('Octavos',R8)+
+    mkCol('1/16 Final',R16)+
     '</div>';
 }
 
