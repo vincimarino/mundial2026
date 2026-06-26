@@ -961,23 +961,23 @@ function renderBracket(){
     '<div class="bt tbd">Perdedor Semi A</div>'+
     '<div class="bt tbd">Perdedor Semi B</div></div>';
 
-  // Static semi dates for when API has no team names yet
-  const semiL = MATCHES.find(m=>m.s==='SEMI_FINALS');
-  const semiR = MATCHES.filter(m=>m.s==='SEMI_FINALS')[1];
+  const staticSemis = MATCHES.filter(m=>m.s==='SEMI_FINALS');
+  const L2use = L2.length ? L2 : (staticSemis[0] ? [staticSemis[0]] : []);
+  const R2use = R2.length ? R2 : (staticSemis[1] ? [staticSemis[1]] : []);
 
   document.getElementById('brk').innerHTML =
     '<div class="brk-wrap">'+
     mkCol('1/16 Final',L16,8,0,null)+
     mkCol('Octavos',L8,4,-1,null)+
     mkCol('Cuartos',L4,2,-1,null)+
-    mkCol('Semis',L2,1,-1,null)+
+    mkCol('Semis',L2use,1,-1,null)+
     '<div class="brk-center">'+
       '<div class="brk-center-title">⭐ FINAL</div>'+
       finalCard+
       '<div style="margin-top:14px;font-family:Bebas Neue,sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--text-muted);text-align:center">3er Puesto</div>'+
       thirdCard+
     '</div>'+
-    mkCol('Semis',R2,1,-1,null)+
+    mkCol('Semis',R2use,1,-1,null)+
     mkCol('Cuartos',R4,2,-1,null)+
     mkCol('Octavos',R8,4,-1,null)+
     mkCol('1/16 Final',R16,8,8,argSlotsR)+
