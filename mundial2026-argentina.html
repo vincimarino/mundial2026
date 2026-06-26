@@ -828,12 +828,25 @@ function getBySt(src,st){
   }).sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
 }
 
-// Slot labels for 1/16 (official FIFA bracket order)
+// Slot labels for 1/16 — orden oficial FIFA (izquierda slots 0-7, derecha slots 8-15)
+// Fuente: FIFA.com oficial
 const SLOT_LABELS = [
-  ['2A','2B'],['1C','2F'],['1E','3ABCDF'],['1F','2C'],
-  ['2E','2I'],['1I','3CDFGH'],['1A','3CEFHI'],['1L','3EHIJK'],
-  ['1H','2J'],['2K','2L'],['2B','3EFGIJ'],['2D','2G'],
-  ['1J','2H'],['1K','3DEIJL'],['1G','3AEHIJ'],['1D','3BEFIJ']
+  ['2A','2B'],    // M73 - SoFi Stadium
+  ['1C','2F'],    // M74 - Houston
+  ['1E','3ABCDF'],// M75 - Boston
+  ['1F','2C'],    // M76 - Monterrey
+  ['2E','2I'],    // M77 - Dallas
+  ['1I','3CDFGH'],// M78 - MetLife NJ
+  ['1A','3CEFHI'],// M79 - Ciudad de México
+  ['1L','3EHIJK'],// M80 - Atlanta
+  ['1H','2J'],    // M81 - Miami ← Argentina si 2ª en J
+  ['2K','2L'],    // M82 - Toronto
+  ['1B','3EFGIJ'],// M83 - Vancouver
+  ['2D','2G'],    // M84 - Dallas
+  ['1J','2H'],    // M85 - Miami ← Argentina si 1ª en J
+  ['1K','3DEIJL'],// M86 - Kansas City
+  ['1G','3AEHIJ'],// M87 - Seattle
+  ['1D','3BEFIJ'] // M88 - Santa Clara
 ];
 
 function slotLabel(idx){
