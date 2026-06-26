@@ -816,62 +816,63 @@ function buildGroup(lbl,teams,hasArg,hasEsp){
 }
 
 // — BRACKET —
-function getApiTeam(id){
-  if(!apiMatches||!id) return null;
-  for(const m of apiMatches){
-    if(m.homeTeam?.id===id) return m.homeTeam;
-    if(m.awayTeam?.id===id) return m.awayTeam;
-  }
-  return null;
+// Cache de equipos por posición (1A, 2H, etc) construido desde apiStandings
+let teamBySlot = {};
+
+function buildSlotCache(){
+  teamBySlot = {};
+  if(!apiStandings) return;
+  Object.entries(apiStandings).forEach(([key, table])=>{
+    const m = key.match(/([A-L])$/);
+    if(!m) return;
+    const letter = m[1];
+    // Solo usar cuando el grupo ha terminado (3 partidos jugados)
+    const finished = table.every(r=>r.playedGames===3);
+    if(!finished) return;
+    if(table[0]?.team) teamBySlot['1'+letter] = table[0].team;
+    if(table[1]?.team) teamBySlot['2'+letter] = table[1].team;
+  });
 }
 
-function showTeam(label, apiId){
-  // 1. Buscar por ID en API
-  if(apiId && apiMatches){
-    const t = getApiTeam(apiId);
-    if(t && t.name && t.name.trim() && t.name!=='TBD'){
-      return apiFlag(t)+' '+esName(t);
-    }
-  }
-  // 2. Buscar en API por fecha del partido estático con ese label
-  if(label && apiMatches){
-    // Mapa label corto -> label largo en datos estáticos
-    const LABEL_MAP = {
-      '2A':'2º Grupo A','2B':'2º Grupo B','1C':'1º Grupo C','2F':'2º Grupo F',
-      '1E':'1º Grupo E','1F':'1º Grupo F','2C':'2º Grupo C','2E':'2º Grupo E',
-      '2I':'2º Grupo I','1I':'1º Grupo I','1A':'1º Grupo A','1L':'1º Grupo L',
-      '1G':'1º Grupo G','1D':'1º Grupo D','1H':'1º Grupo H','2J':'2º Grupo J',
-      '2K':'2º Grupo K','2L':'2º Grupo L','1B':'1º Grupo B','2D':'2º Grupo D',
-      '2G':'2º Grupo G','1J':'1º Grupo J','2H':'2º Grupo H','1K':'1º Grupo K',
-    };
-    const longLabel = LABEL_MAP[label];
-    if(longLabel){
-      const sm = MATCHES.find(m=>m.s==='LAST_32'&&(m.h===longLabel||m.a===longLabel));
-      if(sm){
-        const apiM = apiMatches.find(am=>am.utcDate&&sm.u&&
-          Math.abs(new Date(am.utcDate)-new Date(sm.u)) < 4*3600000);
-        if(apiM){
-          const isHome = sm.h===longLabel;
-          const t = isHome ? apiM.homeTeam : apiM.awayTeam;
-          if(t && t.name && t.name.trim() && t.name!=='TBD' && t.id){
-            return apiFlag(t)+' '+esName(t);
-          }
-        }
-      }
-    }
-  }
-  // 3. Mostrar label FIFA
+function showTeam(label){
   if(!label) return '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
+  // 1. Buscar en cache de clasificaciones (1A, 2H, etc)
+  if(teamBySlot[label]){
+    const t = teamBySlot[label];
+    if(t.name && t.name!=='TBD') return apiFlag(t)+' '+esName(t);
+  }
+  // 2. Es un nombre de equipo real ya puesto manualmente
+  const code = FCODES[label];
+  if(code) return fi(label);
+  // 3. Label FIFA compacto
   const isThird = label.startsWith('3');
-  return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:'+(isThird?'var(--gold-dim)':'var(--gold)')+'">'+label+'</b>';
+  const col = isThird ? 'var(--gold-dim)' : 'var(--gold)';
+  return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:'+col+'">'+label+'</b>';
 }
 
-function getApiResult(hId, aId){
-  if(!apiMatches||!hId||!aId) return null;
-  return apiMatches.find(m=>
-    (m.homeTeam?.id===hId && m.awayTeam?.id===aId)||
-    (m.homeTeam?.id===aId && m.awayTeam?.id===hId)
-  )||null;
+// Mapa de resultados del 1/16 - actualizar manualmente cuando se jueguen
+// Formato: 'LABEL_H:LABEL_A': [golesH, golesA, 'Ganador']
+const R32_RESULTS = {};
+
+function bCard(date, time, hLabel, aLabel, isArg, isFin){
+  const hn = showTeam(hLabel);
+  const an = showTeam(aLabel);
+  const argH = isArg && (hLabel==='1J' || hLabel==='Argentina');
+  const argA = isArg && (aLabel==='2J' || aLabel==='2H');
+  const res = R32_RESULTS[hLabel+':'+aLabel]||null;
+  const hsc = res ? res[0] : null;
+  const asc = res ? res[1] : null;
+  const hW=hsc!=null&&hsc>asc, aW=asc!=null&&asc>hsc;
+  const dateHtml = '<div class="bm-date">'+date+' · '+time+' CEST</div>';
+  const hScHtml = hsc!=null?' <b style="color:var(--gold);font-family:Bebas Neue">'+hsc+'</b>':'';
+  const aScHtml = asc!=null?' <b style="color:var(--gold);font-family:Bebas Neue">'+asc+'</b>':'';
+  const hCls='bt'+(hW?' w':'')+(argH?' at':'');
+  const aCls='bt'+(aW?' w':'')+(argA?' at':'');
+  const bmCls='bm'+(isArg?' ap':'')+(isFin?' fp':'');
+  return '<div class="'+bmCls+'">'+dateHtml+
+    '<div class="'+hCls+'">'+hn+hScHtml+'</div>'+
+    '<div class="'+aCls+'">'+an+aScHtml+'</div>'+
+  '</div>';
 }
 
 function bCard(date, time, hLabel, aLabel, hId, aId, isArg, isFin){
@@ -905,50 +906,51 @@ function mkCol(title, cards){
 }
 
 function renderBracket(){
+  buildSlotCache(); // Actualizar cache desde API standings
   const L16 = [
-    bCard('dom 28 jun','21:00','2A','2B',    null,null,false,false),
-    bCard('lun 29 jun','19:00','1C','2F',    null,null,false,false),
-    bCard('lun 29 jun','22:30','1E','3ABCDF',null,null,false,false),
-    bCard('mar 30 jun','03:00','1F','2C',    null,null,false,false),
-    bCard('mar 30 jun','19:00','2E','2I',    null,null,false,false),
-    bCard('mar 30 jun','23:00','1I','3CDFGH',null,null,false,false),
-    bCard('mié 01 jul','03:00','1A','3CEFHI',null,null,false,false),
-    bCard('mié 01 jul','18:00','1L','3EHIJK',null,null,false,false),
+    bCard('dom 28 jun','21:00','Sudáfrica','Canadá',    false,false),
+    bCard('lun 29 jun','19:00','Brasil','Japón',         false,false),
+    bCard('lun 29 jun','23:30','Alemania','3ABCDF',      false,false),
+    bCard('mar 30 jun','00:00','Países Bajos','Marruecos',false,false),
+    bCard('mar 30 jun','19:00','2E','2I',                false,false),
+    bCard('mar 30 jun','23:00','1I','3CDFGH',            false,false),
+    bCard('mar 30 jun','01:00','México','3CEFHI',        false,false),
+    bCard('mié 01 jul','18:00','1L','3EHIJK',            false,false),
   ];
   const R16 = [
-    bCard('mié 01 jul','22:00','1G','3AEHIJ',null,null,false,false),
-    bCard('jue 02 jul','02:00','1D','3BEFIJ',null,null,false,false),
-    bCard('jue 02 jul','21:00','1H','2J',    null,null,true, false),
-    bCard('vie 03 jul','01:00','2K','2L',    null,null,false,false),
-    bCard('vie 03 jul','05:00','1B','3EFGIJ',null,null,false,false),
-    bCard('vie 03 jul','20:00','2D','2G',    null,null,false,false),
-    bCard('vie 03 jul','22:00','1J','2H',    ARG_ID,null,true, false),
-    bCard('sáb 04 jul','01:30','1K','3DEIJL',null,null,false,false),
+    bCard('mié 01 jul','22:00','1G','3AEHIJ',            false,false),
+    bCard('jue 02 jul','00:00','Estados Unidos','Bosnia-Herzegovina',false,false),
+    bCard('jue 02 jul','21:00','1H','2J',                false,false),
+    bCard('vie 03 jul','01:00','2K','2L',                false,false),
+    bCard('vie 03 jul','03:00','Suiza','3EFGIJ',         false,false),
+    bCard('vie 03 jul','20:00','2D','2G',                false,false),
+    bCard('vie 03 jul','22:00','Argentina','2H',         true, false),
+    bCard('sáb 04 jul','03:30','1K','3DEIJL',            false,false),
   ];
   const L8 = [
-    bCard('sáb 05 jul','19:00','G. Octavos 1','G. Octavos 2',null,null,false,false),
-    bCard('sáb 05 jul','23:00','G. Octavos 3','G. Octavos 4',null,null,false,false),
-    bCard('dom 06 jul','22:00','G. Octavos 5','G. Octavos 6',null,null,false,false),
-    bCard('lun 07 jul','02:00','G. Octavos 7','G. Octavos 8',null,null,false,false),
+    bCard('sáb 05 jul','19:00','G. Octavos 1','G. Octavos 2',false,false),
+    bCard('sáb 05 jul','23:00','G. Octavos 3','G. Octavos 4',false,false),
+    bCard('dom 06 jul','22:00','G. Octavos 5','G. Octavos 6',false,false),
+    bCard('lun 07 jul','02:00','G. Octavos 7','G. Octavos 8',false,false),
   ];
   const R8 = [
-    bCard('lun 06 jul','21:00','G. Octavos 9','G. Octavos 10',null,null,true,false),
-    bCard('mar 07 jul','18:00','G. Octavos 11','G. Octavos 12',null,null,false,false),
-    bCard('mar 07 jul','22:00','G. Octavos 13','G. Octavos 14',null,null,false,false),
-    bCard('mar 07 jul','02:00','G. Octavos 15','G. Octavos 16',null,null,false,false),
+    bCard('lun 06 jul','21:00','G. Octavos 9','G. Octavos 10',true,false),
+    bCard('mar 07 jul','18:00','G. Octavos 11','G. Octavos 12',false,false),
+    bCard('mar 07 jul','22:00','G. Octavos 13','G. Octavos 14',false,false),
+    bCard('mar 07 jul','02:00','G. Octavos 15','G. Octavos 16',false,false),
   ];
   const L4 = [
-    bCard('jue 09 jul','22:00','G. Cuartos A','G. Cuartos B',null,null,false,false),
-    bCard('vie 10 jul','21:00','G. Cuartos C','G. Cuartos D',null,null,false,false),
+    bCard('jue 09 jul','22:00','G. Cuartos A','G. Cuartos B',false,false),
+    bCard('vie 10 jul','21:00','G. Cuartos C','G. Cuartos D',false,false),
   ];
   const R4 = [
-    bCard('sáb 11 jul','23:00','G. Cuartos E','G. Cuartos F',null,null,false,false),
-    bCard('dom 12 jul','03:00','G. Cuartos G','G. Cuartos H',null,null,false,false),
+    bCard('sáb 11 jul','23:00','G. Cuartos E','G. Cuartos F',false,false),
+    bCard('dom 12 jul','03:00','G. Cuartos G','G. Cuartos H',false,false),
   ];
-  const L2 = [bCard('lun 14 jul','21:00','G. Semi A','G. Semi B',null,null,false,false)];
-  const R2 = [bCard('mar 15 jul','21:00','G. Semi C','G. Semi D',null,null,false,false)];
+  const L2 = [bCard('lun 14 jul','21:00','G. Semi A','G. Semi B',false,false)];
+  const R2 = [bCard('mar 15 jul','21:00','G. Semi C','G. Semi D',false,false)];
 
-  const finalCard = bCard('dom 19 jul','21:00','Ganador Semi A','Ganador Semi B',null,null,false,true);
+  const finalCard = bCard('dom 19 jul','21:00','Ganador Semi A','Ganador Semi B',false,true);
   const thirdCard = '<div class="bm" style="border-color:rgba(255,215,0,0.3)">'+
     '<div class="bm-date">Vie 18 jul · 23:00 CEST</div>'+
     '<div class="bt tbd">Perdedor Semi A</div>'+
