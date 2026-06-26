@@ -855,12 +855,15 @@ function slotLabel(idx){
 }
 
 function teamDisplay(team, staticName, slotIdx, isHome){
-  // If we have a real team name from API, use it
-  if(team && team.name && team.name.trim() && team.name!=='null'){
-    const clean = (team.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
-    if(clean) return apiFlag(team)+' '+esName(team);
+  // 1. API has a real team
+  if(team && team.id){
+    const name = esName(team);
+    const flag = apiFlag(team);
+    if(name && name!=='?' && !name.match(/^[A-Z]{2,3}$/)){
+      return flag+' '+name;
+    }
   }
-  // If static data has a real team name (not placeholder), use it
+  // 2. Static name is a real team (not a placeholder)
   if(staticName){
     const isPh = staticName.startsWith('G.')||staticName.includes('Ganador')||
                  staticName.includes('Perdedor')||staticName.match(/^[12]º Grupo/)||
@@ -868,19 +871,15 @@ function teamDisplay(team, staticName, slotIdx, isHome){
                  staticName.includes('Octavos')||staticName.includes('Cuartos')||
                  staticName.includes('Semi');
     if(!isPh) return fi(staticName)||staticName;
-    // For 1/16 placeholders, return compact slot
-    const m1 = staticName.match(/^([12])º Grupo ([A-L])$/);
-    if(m1) return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">'+m1[1]+m1[2]+'</b>';
-    const m2 = staticName.match(/^3º ([A-L\/]+)$/);
-    if(m2) return '<b style="font-family:Bebas Neue,sans-serif;font-size:1rem;color:var(--gold-dim)">3'+m2[1].replace(/\//g,'')+'</b>';
   }
-  // Fallback: use bracket slot label
+  // 3. Show official FIFA bracket slot label
   if(slotIdx>=0){
     const labels = slotLabel(slotIdx);
     const lbl = isHome ? labels[0] : labels[1];
-    return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">'+lbl+'</b>';
+    const isThird = lbl.startsWith('3');
+    return '<b style="font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:'+(isThird?'var(--gold-dim)':'var(--gold)')+'">'+lbl+'</b>';
   }
-  return '<span style="color:var(--text-dim);font-style:italic">Por confirmar</span>';
+  return '<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
 }
 
 function mkCard(m, slotIdx, isArgSlot, isFinal){
@@ -948,12 +947,31 @@ function mkCol(title, matches, total, startSlot, argSlots){
 }
 
 function renderBracket(){
-  const src = apiMatches||MATCHES;
-  const r16 = getBySt(src,'LAST_32');
-  const r8  = getBySt(src,'ROUND_OF_16');
-  const r4  = getBySt(src,'QUARTER_FINALS');
-  const r2  = getBySt(src,'SEMI_FINALS');
-  const fin = getBySt(src,'FINAL');
+  // Para 1/16: siempre usar datos estáticos (orden correcto + labels FIFA)
+  // Para fases posteriores: usar API si disponible (equipos reales)
+  const r16 = getBySt(MATCHES,'LAST_32');
+  const r8  = getBySt(apiMatches||MATCHES,'ROUND_OF_16');
+  const r4  = getBySt(apiMatches||MATCHES,'QUARTER_FINALS');
+  const r2  = getBySt(apiMatches||MATCHES,'SEMI_FINALS');
+  const fin = getBySt(apiMatches||MATCHES,'FINAL');
+  // Enriquecer r16 con resultados reales de la API si existen
+  if(apiMatches){
+    const apiR16 = getBySt(apiMatches,'LAST_32');
+    r16.forEach(sm=>{
+      // Buscar partido equivalente en API por fecha
+      const apiM = apiR16.find(am=>am.utcDate&&sm.u&&am.utcDate.slice(0,10)===sm.u.slice(0,10)&&
+        (esName(am.homeTeam)===sm.h.replace(/<[^>]+>/g,'').trim()||
+         am.utcDate.slice(11,16)===sm.u.slice(11,16)));
+      if(apiM && apiM.status==='FINISHED'){
+        sm.sh = apiM.score?.fullTime?.home;
+        sm.sa = apiM.score?.fullTime?.away;
+        sm.st = 'played';
+        // Update team names with real ones
+        if(apiM.homeTeam?.id) sm.h = esName(apiM.homeTeam);
+        if(apiM.awayTeam?.id) sm.a = esName(apiM.awayTeam);
+      }
+    });
+  }
 
   const L16=r16.slice(0,8), R16=r16.slice(8);
   const L8=r8.slice(0,4),   R8=r8.slice(4);
