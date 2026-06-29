@@ -907,25 +907,27 @@ function mkCol(title, cards){
 
 function renderBracket(){
   buildSlotCache(); // Actualizar cache desde API standings
+  // Cruces oficiales FIFA World Cup 2026 - 1/16 Final
+  // Fuente: imagen oficial bracket (jun 2026)
   const L16 = [
-    bCard('dom 28 jun','21:00','Sudáfrica','Canadá',    false,false),
-    bCard('lun 29 jun','19:00','Brasil','Japón',         false,false),
-    bCard('lun 29 jun','23:30','Alemania','3ABCDF',      false,false),
+    bCard('lun 29 jun','23:30','Alemania','Paraguay',     false,false),
+    bCard('mar 30 jun','23:00','Francia','Suecia',        false,false),
+    bCard('dom 28 jun','21:00','Sudáfrica','Canadá',      false,false),
     bCard('mar 30 jun','00:00','Países Bajos','Marruecos',false,false),
-    bCard('mar 30 jun','19:00','2E','2I',                false,false),
-    bCard('mar 30 jun','23:00','1I','3CDFGH',            false,false),
-    bCard('mar 30 jun','01:00','México','3CEFHI',        false,false),
-    bCard('mié 01 jul','18:00','1L','3EHIJK',            false,false),
+    bCard('mié 01 jul','01:00','Portugal','Croacia',      false,false),
+    bCard('jue 02 jul','21:00','España','Austria',        false,false),
+    bCard('jue 02 jul','00:00','Estados Unidos','Bosnia-Herzegovina',false,false),
+    bCard('vie 03 jul','03:00','Bélgica','Senegal',       false,false),
   ];
   const R16 = [
-    bCard('mié 01 jul','22:00','1G','3AEHIJ',            false,false),
-    bCard('jue 02 jul','00:00','Estados Unidos','Bosnia-Herzegovina',false,false),
-    bCard('jue 02 jul','21:00','1H','2J',                false,false),
-    bCard('vie 03 jul','01:00','2K','2L',                false,false),
-    bCard('vie 03 jul','03:00','Suiza','3EFGIJ',         false,false),
-    bCard('vie 03 jul','20:00','2D','2G',                false,false),
-    bCard('vie 03 jul','22:00','Argentina','2H',         true, false),
-    bCard('sáb 04 jul','03:30','1K','3DEIJL',            false,false),
+    bCard('lun 29 jun','19:00','Brasil','Japón',          false,false),
+    bCard('mié 01 jul','22:00','Costa de Marfil','Noruega',false,false),
+    bCard('dom 28 jun','21:00','México','Ecuador',        false,false),
+    bCard('mié 01 jul','18:00','Inglaterra','RD Congo',   false,false),
+    bCard('vie 03 jul','22:00','Argentina','Cabo Verde',  true, false),
+    bCard('vie 03 jul','20:00','Australia','Egipto',      false,false),
+    bCard('vie 03 jul','01:00','Suiza','Argelia',         false,false),
+    bCard('sáb 04 jul','03:30','Colombia','Ghana',        false,false),
   ];
   const L8 = [
     bCard('sáb 05 jul','19:00','','',false,false),
