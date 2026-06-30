@@ -391,12 +391,12 @@ const MATCHES = [
  {u:'2026-06-26T19:00:00Z',loc:'15:00 ET',h:'Noruega',a:'Francia',v:'Gillette Stadium',c:'Foxborough/Boston',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-26T19:00:00Z',loc:'15:00 ET',h:'Senegal',a:'Iraq',v:'BMO Field',c:'Toronto',g:'Grupo I',s:'GROUP_STAGE',tv:'DAZN'},
  // GRUPO J — ARGENTINA ★
- {u:'2026-06-17T01:00:00Z',loc:'21:00 ET',h:'Argentina',a:'Argelia',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN',arg:true},
+ {u:'2026-06-17T01:00:00Z',loc:'21:00 ET',h:'Argentina',a:'Argelia',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN',arg:true,sh:3,sa:0,st:'played'},
  {u:'2026-06-17T04:00:00Z',loc:'00:00 ET',h:'Austria',a:'Jordania',v:"Levi's Stadium",c:'Santa Clara',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-22T17:00:00Z',loc:'13:00 ET',h:'Argentina',a:'Austria',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)',arg:true},
+ {u:'2026-06-22T17:00:00Z',loc:'13:00 ET',h:'Argentina',a:'Austria',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN / La 1 (RTVE)',arg:true,sh:2,sa:0,st:'played'},
  {u:'2026-06-23T03:00:00Z',loc:'23:00 ET',h:'Jordania',a:'Argelia',v:"Levi's Stadium",c:'Santa Clara',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-28T02:00:00Z',loc:'22:00 ET',h:'Argelia',a:'Austria',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN'},
- {u:'2026-06-28T02:00:00Z',loc:'22:00 ET',h:'Jordania',a:'Argentina',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN',arg:true},
+ {u:'2026-06-28T02:00:00Z',loc:'22:00 ET',h:'Argelia',a:'Austria',v:'Arrowhead Stadium',c:'Kansas City',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN',sh:3,sa:3,st:'played'},
+ {u:'2026-06-28T02:00:00Z',loc:'22:00 ET',h:'Jordania',a:'Argentina',v:'AT&T Stadium',c:'Arlington/Dallas',g:'Grupo J',s:'GROUP_STAGE',tv:'DAZN',arg:true,sh:1,sa:3,st:'played'},
  // GRUPO K
  {u:'2026-06-17T17:00:00Z',loc:'13:00 ET',h:'Portugal',a:'RD Congo',v:'NRG Stadium',c:'Houston',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN'},
  {u:'2026-06-18T02:00:00Z',loc:'22:00 ET',h:'Uzbekistán',a:'Colombia',v:'Estadio Azteca',c:'Ciudad de México',g:'Grupo K',s:'GROUP_STAGE',tv:'DAZN'},
@@ -454,10 +454,10 @@ const MATCHES = [
 // Grupos estáticos — banderas embebidas
 const GROUPS = [
   {k:'J',lbl:'Grupo J',arg:true,teams:[
-    {f:'',n:'Argentina',  id:762, pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
-    {f:'',n:'Austria',    id:2271,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
-    {f:'',n:'Argelia',    id:1607,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
-    {f:'',n:'Jordania',   id:850, pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
+    {f:'',n:'Argentina',  id:762, pj:3,g:3,e:0,p:0,gf:8,gc:1,pts:9},
+    {f:'',n:'Austria',    id:2271,pj:3,g:1,e:1,p:1,gf:5,gc:5,pts:4},
+    {f:'',n:'Argelia',    id:1607,pj:3,g:1,e:1,p:1,gf:6,gc:6,pts:4},
+    {f:'',n:'Jordania',   id:850, pj:3,g:0,e:0,p:3,gf:2,gc:9,pts:0},
   ]},
   {k:'H',lbl:'Grupo H',esp:true,teams:[
     {f:'',n:'España',          id:760, pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0},
@@ -907,53 +907,173 @@ function mkCol(title, cards){
 }
 
 function renderBracket(){
-  buildSlotCache(); // Actualizar cache desde API standings
-  // Cruces oficiales FIFA World Cup 2026 - 1/16 Final
-  // Fuente: imagen oficial bracket (jun 2026)
-  const L16 = [
-    bCard('lun 29 jun','23:30','Alemania','Paraguay',     false,false),
-    bCard('mar 30 jun','23:00','Francia','Suecia',        false,false),
-    bCard('dom 28 jun','21:00','Sudáfrica','Canadá',      false,false),
-    bCard('mar 30 jun','00:00','Países Bajos','Marruecos',false,false),
-    bCard('mié 01 jul','01:00','Portugal','Croacia',      false,false),
-    bCard('jue 02 jul','21:00','España','Austria',        false,false),
-    bCard('jue 02 jul','00:00','Estados Unidos','Bosnia-Herzegovina',false,false),
-    bCard('vie 03 jul','03:00','Bélgica','Senegal',       false,false),
-  ];
-  const R16 = [
-    bCard('lun 29 jun','19:00','Brasil','Japón',          false,false),
-    bCard('mié 01 jul','22:00','Costa de Marfil','Noruega',false,false),
-    bCard('dom 28 jun','21:00','México','Ecuador',        false,false),
-    bCard('mié 01 jul','18:00','Inglaterra','RD Congo',   false,false),
-    bCard('vie 03 jul','22:00','Argentina','Cabo Verde',  true, false),
-    bCard('vie 03 jul','20:00','Australia','Egipto',      false,false),
-    bCard('vie 03 jul','01:00','Suiza','Argelia',         false,false),
-    bCard('sáb 04 jul','03:30','Colombia','Ghana',        false,false),
-  ];
-  const L8 = [
-    bCard('sáb 05 jul','19:00','','',false,false),
-    bCard('sáb 05 jul','23:00','','',false,false),
-    bCard('dom 06 jul','22:00','','',false,false),
-    bCard('lun 07 jul','02:00','','',false,false),
-  ];
-  const R8 = [
-    bCard('lun 06 jul','21:00','','',true,false),
-    bCard('mar 07 jul','18:00','','',false,false),
-    bCard('mar 07 jul','22:00','','',false,false),
-    bCard('mar 07 jul','02:00','','',false,false),
-  ];
-  const L4 = [
-    bCard('jue 09 jul','22:00','','',false,false),
-    bCard('vie 10 jul','21:00','','',false,false),
-  ];
-  const R4 = [
-    bCard('sáb 11 jul','23:00','','',false,false),
-    bCard('dom 12 jul','03:00','','',false,false),
-  ];
-  const L2 = [bCard('lun 14 jul','21:00','','',false,false)];
-  const R2 = [bCard('mar 15 jul','21:00','','',false,false)];
+  buildSlotCache();
 
-  const finalCard = bCard('dom 19 jul','21:00','','',false,true);
+  // ─── DATOS ESTÁTICOS: cruces, fechas y horarios oficiales ───
+  // Cada partido tiene: fecha CEST, hora CEST, equipo local, equipo visitante, esArgentina, esFinal
+  // Los equipos son nombres en español. Si la API tiene resultado, lo muestra y avanza al ganador.
+
+  const MATCHES_R32 = [
+    // IZQUIERDA (L16)
+    {date:'dom 28 jun',time:'21:00',h:'Sudáfrica',   a:'Canadá',              arg:false},
+    {date:'lun 29 jun',time:'23:30',h:'Alemania',    a:'Paraguay',            arg:false},
+    {date:'mar 30 jun',time:'00:00',h:'Países Bajos',a:'Marruecos',           arg:false},
+    {date:'mar 30 jun',time:'23:00',h:'Francia',     a:'Suecia',              arg:false},
+    {date:'mié 01 jul',time:'01:00',h:'Portugal',    a:'Croacia',             arg:false},
+    {date:'jue 02 jul',time:'21:00',h:'España',      a:'Austria',             arg:false},
+    {date:'jue 02 jul',time:'00:00',h:'Estados Unidos',a:'Bosnia-Herzegovina',arg:false},
+    {date:'vie 03 jul',time:'03:00',h:'Bélgica',     a:'Senegal',             arg:false},
+    // DERECHA (R16)
+    {date:'lun 29 jun',time:'19:00',h:'Brasil',      a:'Japón',               arg:false},
+    {date:'mié 01 jul',time:'22:00',h:'Costa de Marfil',a:'Noruega',         arg:false},
+    {date:'dom 28 jun',time:'21:00',h:'México',      a:'Ecuador',             arg:false},
+    {date:'mié 01 jul',time:'18:00',h:'Inglaterra',  a:'RD Congo',            arg:false},
+    {date:'jue 02 jul',time:'03:00',h:'Suiza',       a:'Argelia',             arg:false},
+    {date:'vie 03 jul',time:'20:00',h:'Australia',   a:'Egipto',              arg:false},
+    {date:'vie 03 jul',time:'22:00',h:'Argentina',   a:'Cabo Verde',          arg:true},
+    {date:'vie 03 jul',time:'22:00',h:'Colombia',    a:'Ghana',               arg:false},
+  ];
+
+  const DATES_R8 = [
+    // IZQUIERDA
+    {date:'sáb 04 jul',time:'23:00'},{date:'sáb 04 jul',time:'20:00'},
+    {date:'dom 05 jul',time:'22:00'},{date:'dom 05 jul',time:'03:00'},
+    // DERECHA
+    {date:'lun 06 jul',time:'22:00'},{date:'lun 06 jul',time:'05:00'},
+    {date:'mar 07 jul',time:'18:00'},{date:'mar 07 jul',time:'01:00'},
+  ];
+
+  const DATES_R4 = [
+    {date:'jue 09 jul',time:'22:00'},{date:'vie 10 jul',time:'21:00'},
+    {date:'sáb 11 jul',time:'23:00'},{date:'dom 12 jul',time:'03:00'},
+  ];
+
+  const DATES_R2 = [
+    {date:'lun 14 jul',time:'21:00'},{date:'mar 15 jul',time:'21:00'},
+  ];
+
+  // ─── OBTENER RESULTADO DE UN PARTIDO DESDE LA API ───
+  function getResult(hName, aName){
+    if(!apiMatches) return null;
+    // Buscar por nombre de equipo en español→inglés
+    const toEng = {};
+    Object.entries(ES_NAME).forEach(([en,es])=>{ toEng[es]=en; });
+    const hEn = toEng[hName]||hName;
+    const aEn = toEng[aName]||aName;
+    return apiMatches.find(m=>{
+      const mh = (m.homeTeam?.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
+      const ma = (m.awayTeam?.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
+      return (mh===hEn&&ma===aEn)||(mh===aEn&&ma===hEn)||
+             (mh===hName&&ma===aName)||(mh===aName&&ma===hName);
+    })||null;
+  }
+
+  // ─── CONSTRUIR TARJETA CON RESULTADO DINÁMICO ───
+  function dynCard(date, time, hName, aName, isArg, isFin){
+    const hfl = hName ? (fi(hName)||'') : '';
+    const afl = aName ? (fi(aName)||'') : '';
+    const hn = hName ? (hfl+' '+hName) : '';
+    const an = aName ? (afl+' '+aName) : '';
+    const argH = isArg && hName==='Argentina';
+    const argA = isArg && aName==='Argentina';
+
+    let hsc=null, asc=null, hpen=null, apen=null;
+    const apiM = (hName&&aName) ? getResult(hName,aName) : null;
+    if(apiM && (apiM.status==='FINISHED'||apiM.status==='IN_PLAY'||apiM.status==='PAUSED')){
+      hsc = apiM.score?.fullTime?.home;
+      asc = apiM.score?.fullTime?.away;
+      // Penaltis
+      if(apiM.score?.penalties?.home!=null){
+        hpen = apiM.score.penalties.home;
+        apen = apiM.score.penalties.away;
+      }
+    }
+
+    const hW = hsc!=null && (hsc>asc || (hsc===asc && hpen!=null && hpen>apen));
+    const aW = asc!=null && (asc>hsc || (hsc===asc && apen!=null && apen>hpen));
+    const dateHtml = (date||time) ? '<div class="bm-date">'+(date||'')+' · '+(time||'')+' CEST</div>' : '';
+    const hScHtml = hsc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+hsc+(hpen!=null?'('+hpen+')':'')+'</b>' : '';
+    const aScHtml = asc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+asc+(apen!=null?'('+apen+')':'')+'</b>' : '';
+    const hCls = 'bt'+(hW?' w':'')+(argH?' at':'')+((!hName)?' tbd':'');
+    const aCls = 'bt'+(aW?' w':'')+(argA?' at':'')+((!aName)?' tbd':'');
+    const bmCls = 'bm'+(isArg?' ap':'')+(isFin?' fp':'');
+    return {
+      html: '<div class="'+bmCls+'">'+dateHtml+
+        '<div class="'+hCls+'">'+(hn||'<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>')+hScHtml+'</div>'+
+        '<div class="'+aCls+'">'+(an||'<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>')+aScHtml+'</div>'+
+      '</div>',
+      winner: hW ? hName : (aW ? aName : null),
+      isArg: isArg,
+    };
+  }
+
+  // ─── PROCESAR RONDA: devuelve array de {html, winner} ───
+  function processRound(matches, dates){
+    return matches.map((m,i)=>{
+      const d = dates ? dates[i] : null;
+      const date = d ? d.date : (m.date||'');
+      const time = d ? d.time : (m.time||'');
+      return dynCard(date, time, m.h||null, m.a||null, m.arg||false, false);
+    });
+  }
+
+  // ─── BUILD ROUNDS ───
+  // R32
+  const r32 = processRound(MATCHES_R32, null);
+  const L16cards = r32.slice(0,8).map(x=>x.html);
+  const R16cards = r32.slice(8).map(x=>x.html);
+  const r32winners = r32.map(x=>x.winner);
+
+  // R16 (octavos): pares de ganadores del R32
+  // L: (0v1, 2v3, 4v5, 6v7), R: (8v9, 10v11, 12v13, 14v15)
+  const R16pairs = [
+    [r32winners[0],r32winners[1]],[r32winners[2],r32winners[3]],
+    [r32winners[4],r32winners[5]],[r32winners[6],r32winners[7]],
+    [r32winners[8],r32winners[9]],[r32winners[10],r32winners[11]],
+    [r32winners[12],r32winners[13]],[r32winners[14],r32winners[15]],
+  ];
+  const r16 = R16pairs.map((p,i)=>{
+    const d = DATES_R8[i];
+    const isArg = p[0]==='Argentina'||p[1]==='Argentina';
+    return dynCard(d.date, d.time, p[0], p[1], isArg, false);
+  });
+  const L8cards = r16.slice(0,4).map(x=>x.html);
+  const R8cards = r16.slice(4).map(x=>x.html);
+  const r16winners = r16.map(x=>x.winner);
+
+  // Cuartos: (0v1, 2v3 L), (4v5, 6v7 R)
+  const R4pairs = [
+    [r16winners[0],r16winners[1]],[r16winners[2],r16winners[3]],
+    [r16winners[4],r16winners[5]],[r16winners[6],r16winners[7]],
+  ];
+  const r4 = R4pairs.map((p,i)=>{
+    const d = DATES_R4[i];
+    const isArg = p[0]==='Argentina'||p[1]==='Argentina';
+    return dynCard(d.date, d.time, p[0], p[1], isArg, false);
+  });
+  const L4cards = r4.slice(0,2).map(x=>x.html);
+  const R4cards = r4.slice(2).map(x=>x.html);
+  const r4winners = r4.map(x=>x.winner);
+
+  // Semis: (0v1 L), (2v3 R)
+  const R2pairs = [
+    [r4winners[0],r4winners[1]],
+    [r4winners[2],r4winners[3]],
+  ];
+  const r2 = R2pairs.map((p,i)=>{
+    const d = DATES_R2[i];
+    const isArg = p[0]==='Argentina'||p[1]==='Argentina';
+    return dynCard(d.date, d.time, p[0], p[1], isArg, false);
+  });
+  const L2cards = [r2[0].html];
+  const R2cards = [r2[1].html];
+  const r2winners = r2.map(x=>x.winner);
+
+  // Final
+  const finPair = [r2winners[0], r2winners[1]];
+  const isArgFin = finPair[0]==='Argentina'||finPair[1]==='Argentina';
+  const finalResult = dynCard('dom 19 jul','21:00',finPair[0],finPair[1],isArgFin,true);
+
   const thirdCard = '<div class="bm" style="border-color:rgba(255,215,0,0.3)">'+
     '<div class="bm-date">Vie 18 jul · 23:00 CEST</div>'+
     '<div class="bt tbd">Perdedor Semi A</div>'+
@@ -961,22 +1081,23 @@ function renderBracket(){
 
   document.getElementById('brk').innerHTML =
     '<div class="brk-wrap">'+
-    mkCol('1/16 Final',L16)+
-    mkCol('Octavos',L8)+
-    mkCol('Cuartos',L4)+
-    mkCol('Semis',L2)+
+    mkCol('1/16 Final',L16cards)+
+    mkCol('Octavos',L8cards)+
+    mkCol('Cuartos',L4cards)+
+    mkCol('Semis',L2cards)+
     '<div class="brk-center">'+
       '<div class="brk-center-title">⭐ FINAL</div>'+
-      finalCard+
+      finalResult.html+
       '<div style="margin-top:14px;font-family:Bebas Neue,sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--text-muted);text-align:center">3er Puesto</div>'+
       thirdCard+
     '</div>'+
-    mkCol('Semis',R2)+
-    mkCol('Cuartos',R4)+
-    mkCol('Octavos',R8)+
-    mkCol('1/16 Final',R16)+
+    mkCol('Semis',R2cards)+
+    mkCol('Cuartos',R4cards)+
+    mkCol('Octavos',R8cards)+
+    mkCol('1/16 Final',R16cards)+
     '</div>';
 }
+
 
 // — HERO —
 function renderHero(){
