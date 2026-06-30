@@ -970,10 +970,9 @@ function renderBracket(){
 
   // ─── CONSTRUIR TARJETA CON RESULTADO DINÁMICO ───
   function dynCard(date, time, hName, aName, isArg, isFin){
-    const hfl = hName ? (fi(hName)||'') : '';
-    const afl = aName ? (fi(aName)||'') : '';
-    const hn = hName ? (hfl+' '+hName) : '';
-    const an = aName ? (afl+' '+aName) : '';
+    // fi() devuelve <img>+nombre, así que lo usamos directamente
+    const hn = hName ? fi(hName)||hName : '';
+    const an = aName ? fi(aName)||aName : '';
     const argH = isArg && hName==='Argentina';
     const argA = isArg && aName==='Argentina';
 
