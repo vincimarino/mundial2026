@@ -916,56 +916,56 @@ function renderBracket(){
   // 1/16 Final - Horarios CEST (UTC+2) oficiales
   // Fuente: El Espectador 28 jun 2026 (horarios locales confirmados por FIFA)
   // Conversión: LA/SF/Seattle/Vancouver (PT) +9h | Houston/Dallas/KC/CDMX/Monterrey (CT) +7h | Miami/NY/Atlanta/Boston/Toronto (ET) +6h
+  // 1/16 Final - Horarios CEST confirmados en hora de España
+  // Fuente: ElDiario.es / RTVE (horarios directamente en hora española)
   const MATCHES_R32 = [
     // ── IZQUIERDA (slots 0-7) ──
-    {date:'dom 28 jun',time:'23:00',h:'Sudáfrica',       a:'Canadá',             arg:false}, // LA 14:00 PT
-    {date:'lun 29 jun',time:'21:30',h:'Alemania',        a:'Paraguay',           arg:false}, // Boston 15:30 ET
-    {date:'mar 30 jun',time:'03:00',h:'Países Bajos',    a:'Marruecos',          arg:false}, // Monterrey 20:00 CT
-    {date:'mar 30 jun',time:'22:00',h:'Francia',         a:'Suecia',             arg:false}, // NY 16:00 ET
-    {date:'mié 01 jul',time:'19:00',h:'Costa de Marfil', a:'Noruega',           arg:false}, // Dallas 12:00 CT
-    {date:'jue 02 jul',time:'23:00',h:'España',          a:'Austria',            arg:false}, // LA 14:00 PT
-    {date:'vie 03 jul',time:'01:00',h:'Portugal',        a:'Croacia',            arg:false}, // Toronto 18:00 ET
-    {date:'vie 03 jul',time:'07:00',h:'Suiza',           a:'Argelia',            arg:false}, // Vancouver 22:00 PT
+    {date:'dom 28 jun',time:'21:00',h:'Sudáfrica',       a:'Canadá',             arg:false},
+    {date:'lun 29 jun',time:'22:30',h:'Alemania',        a:'Paraguay',           arg:false},
+    {date:'mar 30 jun',time:'03:00',h:'Países Bajos',    a:'Marruecos',          arg:false},
+    {date:'mar 30 jun',time:'23:00',h:'Francia',         a:'Suecia',             arg:false},
+    {date:'mié 01 jul',time:'18:00',h:'Costa de Marfil', a:'Noruega',           arg:false},
+    {date:'jue 02 jul',time:'23:00',h:'España',          a:'Austria',            arg:false},
+    {date:'vie 03 jul',time:'01:00',h:'Portugal',        a:'Croacia',            arg:false},
+    {date:'vie 03 jul',time:'04:00',h:'Suiza',           a:'Argelia',            arg:false},
     // ── DERECHA (slots 8-15) ──
-    {date:'lun 29 jun',time:'19:00',h:'Brasil',          a:'Japón',              arg:false}, // Houston 12:00 CT
-    {date:'mar 30 jun',time:'03:00',h:'México',          a:'Ecuador',            arg:false}, // CDMX 20:00 CT
-    {date:'mié 01 jul',time:'17:00',h:'Inglaterra',      a:'RD Congo',           arg:false}, // Atlanta 11:00 ET
-    {date:'jue 02 jul',time:'04:00',h:'Estados Unidos',  a:'Bosnia-Herzegovina', arg:false}, // SF 19:00 PT
-    {date:'jue 02 jul',time:'00:00',h:'Bélgica',         a:'Senegal',            arg:false}, // Seattle 15:00 PT
-    {date:'vie 03 jul',time:'20:00',h:'Australia',       a:'Egipto',             arg:false}, // Dallas 13:00 CT
-    {date:'vie 03 jul',time:'23:00',h:'Argentina',       a:'Cabo Verde',         arg:true},  // Miami 17:00 ET
-    {date:'sáb 04 jul',time:'03:30',h:'Colombia',        a:'Ghana',              arg:false}, // KC 20:30 CT
+    {date:'lun 29 jun',time:'19:00',h:'Brasil',          a:'Japón',              arg:false},
+    {date:'mar 30 jun',time:'03:00',h:'México',          a:'Ecuador',            arg:false},
+    {date:'mié 01 jul',time:'18:00',h:'Inglaterra',      a:'RD Congo',           arg:false},
+    {date:'jue 02 jul',time:'02:00',h:'Estados Unidos',  a:'Bosnia-Herzegovina', arg:false},
+    {date:'mié 01 jul',time:'22:00',h:'Bélgica',         a:'Senegal',            arg:false},
+    {date:'vie 03 jul',time:'19:00',h:'Australia',       a:'Egipto',             arg:false},
+    {date:'vie 03 jul',time:'23:00',h:'Argentina',       a:'Cabo Verde',         arg:true},
+    {date:'sáb 04 jul',time:'03:30',h:'Colombia',        a:'Ghana',              arg:false},
   ];
 
-  // Octavos - horarios CEST confirmados (El Desmarque, 29 jun 2026)
-  // Orden: L8[0-3] izquierda, R8[4-7] derecha
-  // L8: Canadá/Mar sáb 19h, Paraguay/ganFraSue sáb 23h, Brasil/Nor dom 22h, ganMex-Ecu/ganIng-Con mar 02h
-  // R8: ganPor-Cro/ganEsp-Aut lun 21h, ganEEUU-Bos/ganBel-Sen mar 02h, ganArg-Cab/ganAus-Egi mar 18h, ganSui-Arg/ganCol-Gha mar 22h
+  // Octavos, Cuartos, Semis - horarios exactos en hora de España (CEST)
+  // Fuente: ElDesmarque 29 jun 2026 (horarios directamente en hora española)
   const DATES_R8 = [
     // IZQUIERDA
     {date:'sáb 04 jul',time:'19:00'}, // Canadá vs Marruecos
-    {date:'sáb 04 jul',time:'23:00'}, // Paraguay vs ganador Francia-Suecia
+    {date:'sáb 04 jul',time:'23:00'}, // Paraguay vs gan. Francia-Suecia
     {date:'dom 05 jul',time:'22:00'}, // Brasil vs Noruega
-    {date:'mar 06 jul',time:'02:00'}, // ganador México-Ecuador vs ganador Inglaterra-Congo
+    {date:'lun 06 jul',time:'02:00'}, // gan. México-Ecuador vs gan. Inglaterra-Congo
     // DERECHA
-    {date:'lun 06 jul',time:'21:00'}, // ganador Portugal-Croacia vs ganador España-Austria
-    {date:'mar 07 jul',time:'02:00'}, // ganador EEUU-Bosnia vs ganador Bélgica-Senegal
-    {date:'mar 07 jul',time:'18:00'}, // ganador Argentina-Cabo Verde vs ganador Australia-Egipto
-    {date:'mar 07 jul',time:'22:00'}, // ganador Suiza-Argelia vs ganador Colombia-Ghana
+    {date:'lun 06 jul',time:'21:00'}, // gan. Portugal-Croacia vs gan. España-Austria
+    {date:'mar 07 jul',time:'02:00'}, // gan. EEUU-Bosnia vs gan. Bélgica-Senegal
+    {date:'mar 07 jul',time:'18:00'}, // gan. Argentina-Cabo Verde vs gan. Australia-Egipto
+    {date:'mar 07 jul',time:'22:00'}, // gan. Suiza-Argelia vs gan. Colombia-Ghana
   ];
 
-  // Cuartos - horarios CEST confirmados
+  // Cuartos - horarios en hora España (ElDesmarque confirmado)
   const DATES_R4 = [
-    {date:'jue 09 jul',time:'22:00'}, // Cuartos L1
-    {date:'vie 10 jul',time:'21:00'}, // Cuartos L2
-    {date:'sáb 11 jul',time:'23:00'}, // Cuartos R1
-    {date:'dom 12 jul',time:'03:00'}, // Cuartos R2
+    {date:'jue 09 jul',time:'22:00'},
+    {date:'vie 10 jul',time:'21:00'},
+    {date:'sáb 11 jul',time:'23:00'},
+    {date:'dom 12 jul',time:'03:00'},
   ];
 
-  // Semifinales - horarios CEST confirmados
+  // Semifinales
   const DATES_R2 = [
-    {date:'lun 14 jul',time:'21:00'}, // Semi A
-    {date:'mar 15 jul',time:'21:00'}, // Semi B
+    {date:'lun 14 jul',time:'21:00'},
+    {date:'mar 15 jul',time:'21:00'},
   ];
 
   // ─── OBTENER RESULTADO DE UN PARTIDO DESDE LA API ───
