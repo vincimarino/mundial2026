@@ -909,369 +909,121 @@ function mkCol(title, cards){
 function renderBracket(){
   buildSlotCache();
 
-  // ─── DATOS ESTÁTICOS: cruces, fechas y horarios oficiales ───
-  // Cada partido tiene: fecha CEST, hora CEST, equipo local, equipo visitante, esArgentina, esFinal
-  // Los equipos son nombres en español. Si la API tiene resultado, lo muestra y avanza al ganador.
-
-  // 1/16 Final - Horarios CEST (UTC+2) oficiales
-  // Fuente: El Espectador 28 jun 2026 (horarios locales confirmados por FIFA)
-  // Conversión: LA/SF/Seattle/Vancouver (PT) +9h | Houston/Dallas/KC/CDMX/Monterrey (CT) +7h | Miami/NY/Atlanta/Boston/Toronto (ET) +6h
-  // 1/16 Final - Horarios CEST confirmados en hora de España
-  // Fuente: ElDiario.es / RTVE (horarios directamente en hora española)
-  const MATCHES_R32 = [
-    // ── IZQUIERDA (slots 0-7) ──
-    {date:'dom 28 jun',time:'21:00',h:'Sudáfrica',       a:'Canadá',             arg:false},
-    {date:'lun 29 jun',time:'22:30',h:'Alemania',        a:'Paraguay',           arg:false},
-    {date:'mar 30 jun',time:'03:00',h:'Países Bajos',    a:'Marruecos',          arg:false},
-    {date:'mar 30 jun',time:'23:00',h:'Francia',         a:'Suecia',             arg:false},
-    {date:'mié 01 jul',time:'18:00',h:'Costa de Marfil', a:'Noruega',           arg:false},
-    {date:'jue 02 jul',time:'23:00',h:'España',          a:'Austria',            arg:false},
-    {date:'vie 03 jul',time:'01:00',h:'Portugal',        a:'Croacia',            arg:false},
-    {date:'vie 03 jul',time:'04:00',h:'Suiza',           a:'Argelia',            arg:false},
-    // ── DERECHA (slots 8-15) ──
-    {date:'lun 29 jun',time:'19:00',h:'Brasil',          a:'Japón',              arg:false},
-    {date:'mar 30 jun',time:'03:00',h:'México',          a:'Ecuador',            arg:false},
-    {date:'mié 01 jul',time:'18:00',h:'Inglaterra',      a:'RD Congo',           arg:false},
-    {date:'jue 02 jul',time:'02:00',h:'Estados Unidos',  a:'Bosnia-Herzegovina', arg:false},
-    {date:'mié 01 jul',time:'22:00',h:'Bélgica',         a:'Senegal',            arg:false},
-    {date:'vie 03 jul',time:'19:00',h:'Australia',       a:'Egipto',             arg:false},
-    {date:'vie 03 jul',time:'23:00',h:'Argentina',       a:'Cabo Verde',         arg:true},
-    {date:'sáb 04 jul',time:'03:30',h:'Colombia',        a:'Ghana',              arg:false},
-  ];
-
-  // Octavos, Cuartos, Semis - horarios exactos en hora de España (CEST)
-  // Fuente: ElDesmarque 29 jun 2026 (horarios directamente en hora española)
-  const DATES_R8 = [
-    // IZQUIERDA
-    {date:'sáb 04 jul',time:'19:00'}, // Canadá vs Marruecos
-    {date:'sáb 04 jul',time:'23:00'}, // Paraguay vs gan. Francia-Suecia
-    {date:'dom 05 jul',time:'22:00'}, // Brasil vs Noruega
-    {date:'lun 06 jul',time:'02:00'}, // gan. México-Ecuador vs gan. Inglaterra-Congo
-    // DERECHA
-    {date:'lun 06 jul',time:'21:00'}, // gan. Portugal-Croacia vs gan. España-Austria
-    {date:'mar 07 jul',time:'02:00'}, // gan. EEUU-Bosnia vs gan. Bélgica-Senegal
-    {date:'mar 07 jul',time:'18:00'}, // gan. Argentina-Cabo Verde vs gan. Australia-Egipto
-    {date:'mar 07 jul',time:'22:00'}, // gan. Suiza-Argelia vs gan. Colombia-Ghana
-  ];
-
-  // Cuartos - horarios en hora España (ElDesmarque confirmado)
-  const DATES_R4 = [
-    {date:'jue 09 jul',time:'22:00'},
-    {date:'vie 10 jul',time:'21:00'},
-    {date:'sáb 11 jul',time:'23:00'},
-    {date:'dom 12 jul',time:'03:00'},
-  ];
-
-  // Semifinales
-  const DATES_R2 = [
-    {date:'lun 14 jul',time:'21:00'},
-    {date:'mar 15 jul',time:'21:00'},
-  ];
-
-  // ─── OBTENER RESULTADO DE UN PARTIDO DESDE LA API ───
-  function getResult(hName, aName){
-    if(!apiMatches) return null;
-    // Buscar por nombre de equipo en español→inglés
-    const toEng = {};
-    Object.entries(ES_NAME).forEach(([en,es])=>{ toEng[es]=en; });
-    const hEn = toEng[hName]||hName;
-    const aEn = toEng[aName]||aName;
+  function apiRes(h,a){
+    if(!apiMatches||!h||!a) return null;
+    const toEn={};
+    Object.entries(ES_NAME).forEach(([en,es])=>{ toEn[es]=en; });
     return apiMatches.find(m=>{
-      const mh = (m.homeTeam?.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
-      const ma = (m.awayTeam?.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
+      const mh=(m.homeTeam?.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
+      const ma=(m.awayTeam?.name||'').replace(/^[A-Z]{2,4}\s+/,'').trim();
+      const hEn=toEn[h]||h, aEn=toEn[a]||a;
       return (mh===hEn&&ma===aEn)||(mh===aEn&&ma===hEn)||
-             (mh===hName&&ma===aName)||(mh===aName&&ma===hName);
+             (mh===h&&ma===a)||(mh===a&&ma===h);
     })||null;
   }
 
-  // ─── CONSTRUIR TARJETA CON RESULTADO DINÁMICO ───
-  function dynCard(date, time, hName, aName, isArg, isFin){
-    // fi() devuelve <img>+nombre, así que lo usamos directamente
-    const hn = hName ? fi(hName)||hName : '';
-    const an = aName ? fi(aName)||aName : '';
-    const argH = isArg && hName==='Argentina';
-    const argA = isArg && aName==='Argentina';
-
-    let hsc=null, asc=null, hpen=null, apen=null;
-    const apiM = (hName&&aName) ? getResult(hName,aName) : null;
-    if(apiM && (apiM.status==='FINISHED'||apiM.status==='IN_PLAY'||apiM.status==='PAUSED')){
-      hsc = apiM.score?.fullTime?.home;
-      asc = apiM.score?.fullTime?.away;
-      // Penaltis
-      if(apiM.score?.penalties?.home!=null){
-        hpen = apiM.score.penalties.home;
-        apen = apiM.score.penalties.away;
-      }
+  function card(date,time,h,a,isArg,isFin){
+    const hn=h?(fi(h)||''):'';
+    const an=a?(fi(a)||''):'';
+    const argH=isArg&&h==='Argentina', argA=isArg&&a==='Argentina';
+    let hsc=null,asc=null,hpen=null,apen=null;
+    const m=(h&&a)?apiRes(h,a):null;
+    if(m&&(m.status==='FINISHED'||m.status==='IN_PLAY'||m.status==='PAUSED')){
+      hsc=m.score?.fullTime?.home; asc=m.score?.fullTime?.away;
+      if(m.score?.penalties?.home!=null){hpen=m.score.penalties.home;apen=m.score.penalties.away;}
     }
-
-    const hW = hsc!=null && (hsc>asc || (hsc===asc && hpen!=null && hpen>apen));
-    const aW = asc!=null && (asc>hsc || (hsc===asc && apen!=null && apen>hpen));
-    const dateHtml = (date||time) ? '<div class="bm-date">'+(date||'')+' · '+(time||'')+' CEST</div>' : '';
-    const hScHtml = hsc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+hsc+(hpen!=null?'('+hpen+')':'')+'</b>' : '';
-    const aScHtml = asc!=null ? ' <b style="color:var(--gold);font-family:Bebas Neue">'+asc+(apen!=null?'('+apen+')':'')+'</b>' : '';
-    const hCls = 'bt'+(hW?' w':'')+(argH?' at':'')+((!hName)?' tbd':'');
-    const aCls = 'bt'+(aW?' w':'')+(argA?' at':'')+((!aName)?' tbd':'');
-    const bmCls = 'bm'+(isArg?' ap':'')+(isFin?' fp':'');
+    const hW=hsc!=null&&(hsc>asc||(hsc===asc&&hpen!=null&&hpen>apen));
+    const aW=asc!=null&&(asc>hsc||(hsc===asc&&apen!=null&&apen>hpen));
+    const dateHtml=(date||time)?'<div class="bm-date">'+(date||'')+' · '+(time||'')+' CEST</div>':'';
+    const hSc=hsc!=null?' <b style="color:var(--gold);font-family:Bebas Neue">'+hsc+(hpen!=null?' ('+hpen+')':'')+'</b>':'';
+    const aSc=asc!=null?' <b style="color:var(--gold);font-family:Bebas Neue">'+asc+(apen!=null?' ('+apen+')':'')+'</b>':'';
+    const hCls='bt'+(hW?' w':'')+(argH?' at':'')+(!h?' tbd':'');
+    const aCls='bt'+(aW?' w':'')+(argA?' at':'')+(!a?' tbd':'');
+    const bmCls='bm'+(isArg?' ap':'')+(isFin?' fp':'');
+    const hD=hn||'<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
+    const aD=an||'<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>';
     return {
-      html: '<div class="'+bmCls+'">'+dateHtml+
-        '<div class="'+hCls+'">'+(hn||'<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>')+hScHtml+'</div>'+
-        '<div class="'+aCls+'">'+(an||'<span style="color:var(--text-dim);font-style:italic;font-size:0.75rem">Por confirmar</span>')+aScHtml+'</div>'+
-      '</div>',
-      winner: hW ? hName : (aW ? aName : null),
-      isArg: isArg,
+      html:'<div class="'+bmCls+'">'+dateHtml+'<div class="'+hCls+'">'+hD+hSc+'</div><div class="'+aCls+'">'+aD+aSc+'</div></div>',
+      w:hW?h:(aW?a:null),
+      arg:isArg
     };
   }
 
-  // ─── PROCESAR RONDA: devuelve array de {html, winner} ───
-  function processRound(matches, dates){
-    return matches.map((m,i)=>{
-      const d = dates ? dates[i] : null;
-      const date = d ? d.date : (m.date||'');
-      const time = d ? d.time : (m.time||'');
-      return dynCard(date, time, m.h||null, m.a||null, m.arg||false, false);
-    });
+  // ── 1/16 FINAL — orden oficial bracket FIFA (imagen La Prensa/Diez/El Heraldo) ──
+  const r32L = [
+    card('lun 29 jun','22:30','Alemania',      'Paraguay',            false,false),
+    card('mar 30 jun','23:00','Francia',        'Suecia',              false,false),
+    card('dom 28 jun','21:00','Sudáfrica',      'Canadá',              false,false),
+    card('mar 30 jun','03:00','Países Bajos',   'Marruecos',           false,false),
+    card('vie 03 jul','01:00','Portugal',       'Croacia',             false,false),
+    card('jue 02 jul','23:00','España',         'Austria',             false,false),
+    card('jue 02 jul','02:00','Estados Unidos', 'Bosnia-Herzegovina',  false,false),
+    card('mié 01 jul','22:00','Bélgica',        'Senegal',             false,false),
+  ];
+
+  const r32R = [
+    card('lun 29 jun','19:00','Brasil',         'Japón',               false,false),
+    card('mié 01 jul','18:00','Costa de Marfil','Noruega',             false,false),
+    card('mar 30 jun','03:00','México',         'Ecuador',             false,false),
+    card('mié 01 jul','18:00','Inglaterra',     'RD Congo',            false,false),
+    card('vie 03 jul','23:00','Argentina',      'Cabo Verde',          true, false),
+    card('vie 03 jul','19:00','Australia',      'Egipto',              false,false),
+    card('vie 03 jul','04:00','Suiza',          'Argelia',             false,false),
+    card('sáb 04 jul','03:30','Colombia',       'Ghana',               false,false),
+  ];
+
+  // ── OCTAVOS — pares del bracket: L[0]+L[1], L[2]+L[3], L[4]+L[5], L[6]+L[7] ──
+  function pair(a,b,date,time){
+    const isArg=(a.arg||b.arg)||(a.w==='Argentina'||b.w==='Argentina');
+    return card(date,time,a.w,b.w,isArg,false);
   }
 
-  // ─── BUILD ROUNDS ───
-  // R32
-  const r32 = processRound(MATCHES_R32, null);
-  const L16cards = r32.slice(0,8).map(x=>x.html);
-  const R16cards = r32.slice(8).map(x=>x.html);
-  const r32winners = r32.map(x=>x.winner);
-
-  // R16 (octavos): pares de ganadores del R32
-  // L: (0v1, 2v3, 4v5, 6v7), R: (8v9, 10v11, 12v13, 14v15)
-  const R16pairs = [
-    [r32winners[0],r32winners[1]],[r32winners[2],r32winners[3]],
-    [r32winners[4],r32winners[5]],[r32winners[6],r32winners[7]],
-    [r32winners[8],r32winners[9]],[r32winners[10],r32winners[11]],
-    [r32winners[12],r32winners[13]],[r32winners[14],r32winners[15]],
+  const octL=[
+    pair(r32L[0],r32L[1],'sáb 04 jul','23:00'), // Paraguay vs Francia
+    pair(r32L[2],r32L[3],'sáb 04 jul','19:00'), // Canadá vs Marruecos
+    pair(r32L[4],r32L[5],'lun 06 jul','21:00'), // Por/Cro vs Esp/Aut
+    pair(r32L[6],r32L[7],'mar 07 jul','02:00'), // EEUU/Bos vs Bel/Sen
   ];
-  const r16 = R16pairs.map((p,i)=>{
-    const d = DATES_R8[i];
-    const isArg = p[0]==='Argentina'||p[1]==='Argentina';
-    return dynCard(d.date, d.time, p[0], p[1], isArg, false);
-  });
-  const L8cards = r16.slice(0,4).map(x=>x.html);
-  const R8cards = r16.slice(4).map(x=>x.html);
-  const r16winners = r16.map(x=>x.winner);
-
-  // Cuartos: (0v1, 2v3 L), (4v5, 6v7 R)
-  const R4pairs = [
-    [r16winners[0],r16winners[1]],[r16winners[2],r16winners[3]],
-    [r16winners[4],r16winners[5]],[r16winners[6],r16winners[7]],
+  const octR=[
+    pair(r32R[0],r32R[1],'dom 05 jul','22:00'), // Brasil vs Noruega
+    pair(r32R[2],r32R[3],'lun 06 jul','02:00'), // Méx/Ecu vs Ing/Congo
+    pair(r32R[4],r32R[5],'mar 07 jul','18:00'), // Arg vs Aus/Egi ★
+    pair(r32R[6],r32R[7],'mar 07 jul','22:00'), // Sui/Arg vs Col/Gha
   ];
-  const r4 = R4pairs.map((p,i)=>{
-    const d = DATES_R4[i];
-    const isArg = p[0]==='Argentina'||p[1]==='Argentina';
-    return dynCard(d.date, d.time, p[0], p[1], isArg, false);
-  });
-  const L4cards = r4.slice(0,2).map(x=>x.html);
-  const R4cards = r4.slice(2).map(x=>x.html);
-  const r4winners = r4.map(x=>x.winner);
 
-  // Semis: (0v1 L), (2v3 R)
-  const R2pairs = [
-    [r4winners[0],r4winners[1]],
-    [r4winners[2],r4winners[3]],
+  // ── CUARTOS ──
+  const qtrL=[
+    pair(octL[0],octL[1],'jue 09 jul','22:00'),
+    pair(octL[2],octL[3],'vie 10 jul','21:00'),
   ];
-  const r2 = R2pairs.map((p,i)=>{
-    const d = DATES_R2[i];
-    const isArg = p[0]==='Argentina'||p[1]==='Argentina';
-    return dynCard(d.date, d.time, p[0], p[1], isArg, false);
-  });
-  const L2cards = [r2[0].html];
-  const R2cards = [r2[1].html];
-  const r2winners = r2.map(x=>x.winner);
+  const qtrR=[
+    pair(octR[0],octR[1],'sáb 11 jul','23:00'),
+    pair(octR[2],octR[3],'dom 12 jul','03:00'),
+  ];
 
-  // Final
-  const finPair = [r2winners[0], r2winners[1]];
-  const isArgFin = finPair[0]==='Argentina'||finPair[1]==='Argentina';
-  const finalResult = dynCard('dom 19 jul','21:00',finPair[0],finPair[1],isArgFin,true);
+  // ── SEMIS ──
+  const semiL=pair(qtrL[0],qtrL[1],'lun 14 jul','21:00');
+  const semiR=pair(qtrR[0],qtrR[1],'mar 15 jul','21:00');
 
-  const thirdCard = '<div class="bm" style="border-color:rgba(255,215,0,0.3)">'+
-    '<div class="bm-date">Vie 18 jul · 23:00 CEST</div>'+
-    '<div class="bt tbd">Perdedor Semi A</div>'+
-    '<div class="bt tbd">Perdedor Semi B</div></div>';
+  // ── FINAL ──
+  const fin=card('dom 19 jul','21:00',semiL.w,semiR.w,(semiL.arg||semiR.arg),true);
+  const third='<div class="bm" style="border-color:rgba(255,215,0,0.3)"><div class="bm-date">Vie 18 jul · 23:00 CEST</div><div class="bt tbd">Perdedor Semi A</div><div class="bt tbd">Perdedor Semi B</div></div>';
 
-  document.getElementById('brk').innerHTML =
+  const mkCol=(t,cs)=>'<div class="brk-col"><div class="brk-col-title">'+t+'</div><div class="brk-slots">'+cs.map(c=>c.html||c).join('')+'</div></div>';
+
+  document.getElementById('brk').innerHTML=
     '<div class="brk-wrap">'+
-    mkCol('1/16 Final',L16cards)+
-    mkCol('Octavos',L8cards)+
-    mkCol('Cuartos',L4cards)+
-    mkCol('Semis',L2cards)+
-    '<div class="brk-center">'+
-      '<div class="brk-center-title">⭐ FINAL</div>'+
-      finalResult.html+
-      '<div style="margin-top:14px;font-family:Bebas Neue,sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--text-muted);text-align:center">3er Puesto</div>'+
-      thirdCard+
+    mkCol('1/16 Final',r32L)+
+    mkCol('Octavos',octL)+
+    mkCol('Cuartos',qtrL)+
+    mkCol('Semis',[semiL])+
+    '<div class="brk-center"><div class="brk-center-title">⭐ FINAL</div>'+fin.html+
+    '<div style="margin-top:14px;font-family:Bebas Neue,sans-serif;font-size:0.85rem;letter-spacing:2px;color:var(--text-muted);text-align:center">3er Puesto</div>'+third+
     '</div>'+
-    mkCol('Semis',R2cards)+
-    mkCol('Cuartos',R4cards)+
-    mkCol('Octavos',R8cards)+
-    mkCol('1/16 Final',R16cards)+
+    mkCol('Semis',[semiR])+
+    mkCol('Cuartos',qtrR)+
+    mkCol('Octavos',octR)+
+    mkCol('1/16 Final',r32R)+
     '</div>';
 }
 
-
-// — HERO —
-function renderHero(){
-  const now=new Date();
-  const src=apiMatches||MATCHES;
-  const argMs=src.filter(m=>apiMatches?(m.homeTeam?.id===ARG_ID||m.awayTeam?.id===ARG_ID):!!m.arg)
-    .sort((a,b)=>new Date(a.utcDate||a.u)-new Date(b.utcDate||b.u));
-  const next=argMs.find(m=>new Date(m.utcDate||m.u)>now&&(m.status||'')!=='FINISHED');
-
-  // Stats from standings
-  let pos='1º',pj=0,g=0,e=0,p=0,gf=0,gc=0,pts=0;
-  if(apiStandings){
-    const grp=Object.values(apiStandings).find(arr=>arr.some(r=>r.team?.id===ARG_ID));
-    if(grp){const row=grp.find(r=>r.team?.id===ARG_ID);if(row){
-      pos=(grp.indexOf(row)+1)+'º';pj=row.playedGames||0;g=row.won||0;e=row.draw||0;p=row.lost||0;
-      gf=row.goalsFor||0;gc=row.goalsAgainst||0;pts=row.points||0;
-    }}
-  }
-  ['s0','s1','s2','s3','s4','s5','s6','s7','s8'].forEach((id,i)=>{
-    const vals=[pos,pj,g,e,p,gf,gc,(gf-gc>=0?'+'+(gf-gc):gf-gc),pts];
-    document.getElementById(id).textContent=vals[i];
-  });
-
-  // Next match
-  if(next){
-    let hn,an,tv;
-    if(apiMatches){
-      hn=`${apiFlag(next.homeTeam)} ${apiName(next.homeTeam)}`;
-      an=`${apiFlag(next.awayTeam)} ${apiName(next.awayTeam)}`;
-      tv=next.homeTeam?.id===ARG_ID||next.awayTeam?.id===ARG_ID?'DAZN / La 1 (RTVE)':'DAZN';
-    } else { hn=fi(next.h||''); an=fi(next.a||''||next.a); tv=next.tv; }
-    const dt=new Date(next.utcDate||next.u);
-    document.getElementById('nmc').innerHTML=`
-      <div class="nm-teams">
-        <div class="nm-tn">${hn}</div><div class="nm-vs">VS</div><div class="nm-tn">${an}</div>
-      </div>
-      <div class="nm-info">
-        <span>📅 <strong>${fmtD(dt)}</strong></span>
-        <span>🕑 <strong>${fmtT(dt)} CEST</strong></span>
-        <span>🏟️ <strong>${next.v||next.venue||'Por confirmar'}</strong></span>
-        <span>📺 <strong>${tv}</strong></span>
-      </div>`;
-    window._cdt=dt;
-    document.getElementById('cdlbl').innerHTML=`hasta ${hn} vs ${an}`;
-    if(dt-now>0&&dt-now<86400000){
-      document.getElementById('alb').classList.add('show');
-      document.getElementById('alt').innerHTML=`🚨 ¡Argentina juega en menos de 24 horas! ${hn} vs ${an} · ${fmtT(dt)} CEST · 📺 ${tv}`;
-    }
-  }
-
-  // History
-  const hist=document.getElementById('hist');
-  if(!argMs.length) return;
-  hist.innerHTML=argMs.map(m=>{
-    let hn,an,st,score=null;
-    if(apiMatches){
-      hn=`${apiFlag(m.homeTeam)} ${esName(m.homeTeam)}`;
-      an=`${apiFlag(m.awayTeam)} ${esName(m.awayTeam)}`;
-      st=m.status==='FINISHED'?'played':m.status==='IN_PLAY'||m.status==='PAUSED'?'live':'upcoming';
-      if(m.score?.fullTime?.home!=null) score=`${m.score.fullTime.home} - ${m.score.fullTime.away}`;
-    } else { hn=m.h; an=m.a; st=m.st||'upcoming'; if(m.sh!=null) score=`${m.sh} - ${m.sa}`; }
-    const dt=new Date(m.utcDate||m.u);
-    let cls='pend',badge='';
-    if(st==='played'){cls='win';badge=`<span class="rs">${score}</span>`;}
-    else if(st==='live'){cls='pend';badge='<span class="bl">🔴 EN VIVO</span>';}
-    else badge=`<span class="bp">⏳ ${fmtD(dt)} ${fmtT(dt)}</span>`;
-    return `<div class="ri ${cls}"><span class="rp">${m.g||m.group||''}</span><span class="rt">${apiMatches?hn:fi(m.h||'')} vs ${apiMatches?an:fi(m.a||'')}</span>${badge}</div>`;
-  }).join('');
-}
-
-// ═══════════════════════════════════════════════
-// API LOAD
-// ═══════════════════════════════════════════════
-async function loadData(silent=false){
-  const PROXIES = [
-    'https://corsproxy.io/?url=',
-    'https://api.allorigins.win/raw?url=',
-    'https://cors-anywhere.herokuapp.com/',
-    '', // intento directo sin proxy
-  ];
-
-  let loaded = false;
-  for(const proxy of PROXIES){
-    try{
-      const url1 = proxy ? proxy+encodeURIComponent(`${API_BASE}/competitions/WC/matches`) : `${API_BASE}/competitions/WC/matches`;
-      const url2 = proxy ? proxy+encodeURIComponent(`${API_BASE}/competitions/WC/standings`) : `${API_BASE}/competitions/WC/standings`;
-      const [mr,sr] = await Promise.all([
-        fetch(url1,{headers:{'X-Auth-Token':API_KEY},signal:AbortSignal.timeout(8000)}),
-        fetch(url2,{headers:{'X-Auth-Token':API_KEY},signal:AbortSignal.timeout(8000)}).catch(()=>null)
-      ]);
-      if(!mr.ok) throw new Error(mr.status);
-      const md = await mr.json();
-      if(md.matches?.length){
-        apiMatches = md.matches;
-        if(sr?.ok){
-          const sd = await sr.json();
-          apiStandings = {};
-          (sd.standings||[]).forEach(g=>{apiStandings[g.group||g.stage]=g.table||[];});
-        }
-        document.getElementById('abadge').textContent='⬤ API en vivo';
-        document.getElementById('abadge').className='apib api-ok';
-        document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
-        renderAll();
-        loaded = true;
-        break;
-      }
-    }catch(e){
-      console.warn('Proxy falló, intentando siguiente...', proxy, e.message);
-    }
-  }
-  if(!loaded){
-    console.warn('Todos los proxies fallaron, usando datos estáticos');
-    apiMatches=null; apiStandings=null;
-    document.getElementById('abadge').textContent='⬤ Datos estáticos';
-    document.getElementById('abadge').className='apib api-no';
-    document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
-    renderAll();
-  }
-  document.getElementById('lov').classList.add('h');
-}
-
-// ═══════════════════════════════════════════════
-// CLOCK + COUNTDOWN
-// ═══════════════════════════════════════════════
-function tick(){
-  document.getElementById('clk').textContent=mfmt(new Date(),{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' CEST';
-  if(window._cdt){
-    let d=Math.max(0,window._cdt-new Date());
-    const dd=Math.floor(d/86400000);d-=dd*86400000;
-    const hh=Math.floor(d/3600000);d-=hh*3600000;
-    const mm=Math.floor(d/60000);d-=mm*60000;
-    const ss=Math.floor(d/1000);
-    document.getElementById('cdd').textContent=pad(dd);
-    document.getElementById('cdh').textContent=pad(hh);
-    document.getElementById('cdm').textContent=pad(mm);
-    document.getElementById('cds').textContent=pad(ss);
-  }
-}
-
-function swTab(id,btn){
-  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('act'));
-  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('act'));
-  document.getElementById('tc-'+id).classList.add('act');
-  btn.classList.add('act');
-}
-
-// INIT — render static immediately, then try API
-document.addEventListener('DOMContentLoaded', function(){
-  try {
-    renderAll();
-    document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
-    setInterval(tick,1000); tick();
-  } catch(e){ console.error('Init error:', e); }
-  // Force hide loading after 5 seconds no matter what
-  setTimeout(()=>document.getElementById('lov').classList.add('h'), 3000);
-  // Try API in background
-  setTimeout(()=>loadData(true), 500);
-  setInterval(()=>loadData(true),3*60*1000);
-});
-</script>
-</body>
-</html>
