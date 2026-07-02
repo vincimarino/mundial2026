@@ -644,12 +644,123 @@ window._cdt=new Date('2026-06-17T01:00:00Z');
 // ═══════════════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════════════
+// — HERO: próximo partido de Argentina, cuenta regresiva e historial —
+function renderHero(){
+  const now = new Date();
+  const argMatches = [
+    {u:'2026-06-17T01:00:00Z', h:'Argentina', a:'Argelia',   lbl:'Grupos J1', v:'Arrowhead Stadium, Kansas City', tv:'DAZN', sh:3, sa:0},
+    {u:'2026-06-22T17:00:00Z', h:'Argentina', a:'Austria',   lbl:'Grupos J2', v:'AT&T Stadium, Dallas', tv:'DAZN / La 1 (RTVE)', sh:2, sa:0},
+    {u:'2026-06-28T02:00:00Z', h:'Jordania',  a:'Argentina', lbl:'Grupos J3', v:'AT&T Stadium, Dallas', tv:'DAZN', sh:1, sa:3},
+    {u:'2026-07-03T21:00:00Z', h:'Argentina', a:'Cabo Verde',lbl:'1/16 Final', v:'Hard Rock Stadium, Miami', tv:'DAZN', sh:null, sa:null},
+  ];
+
+  const next = argMatches.find(m => m.sh==null && new Date(m.u) > now) 
+            || argMatches.find(m => new Date(m.u) > now)
+            || argMatches[argMatches.length-1];
+
+  if(next){
+    const dt = new Date(next.u);
+    document.getElementById('nmc').innerHTML =
+      '<div class="nm-teams">'+
+        '<div class="nm-tn">'+(fi(next.h)||next.h)+'</div>'+
+        '<div class="nm-vs">VS</div>'+
+        '<div class="nm-tn">'+(fi(next.a)||next.a)+'</div>'+
+      '</div>'+
+      '<div class="nm-info">'+
+        '<span>📅 <strong>'+fmtD(dt)+'</strong></span>'+
+        '<span>🕑 <strong>'+fmtT(dt)+' CEST</strong></span>'+
+        '<span>🏟️ <strong>'+next.v+'</strong></span>'+
+        '<span>📺 <strong>'+next.tv+'</strong></span>'+
+      '</div>';
+    window._cdt = dt;
+    document.getElementById('cdlbl').textContent = 'hasta '+next.h+' vs '+next.a;
+  }
+
+  let histHtml = '';
+  argMatches.forEach(m => {
+    const dt = new Date(m.u);
+    if(m.sh != null){
+      const argWon = (m.h==='Argentina' && m.sh>m.sa) || (m.a==='Argentina' && m.sa>m.sh);
+      const cls = argWon ? 'win' : (m.sh===m.sa ? 'draw' : 'loss');
+      const badge = argWon ? '✅ '+m.sh+' - '+m.sa : '🔶 '+m.sh+' - '+m.sa;
+      histHtml += '<div class="ri '+cls+'"><span class="rp">'+m.lbl+'</span><span class="rt">'+m.h+' vs '+m.a+'</span><span class="bp" style="color:'+(argWon?'#4ade80':'var(--gold)')+'">'+badge+'</span></div>';
+    } else {
+      histHtml += '<div class="ri pend"><span class="rp">'+m.lbl+'</span><span class="rt">'+m.h+' vs '+m.a+'</span><span class="bp">⏳ '+fmtD(dt)+' '+fmtT(dt)+' CEST</span></div>';
+    }
+  });
+  document.getElementById('hist').innerHTML = histHtml;
+}
+
 function renderAll(){
   renderCalendar();
   renderGroups();
   renderBracket();
   renderHero();
 }
+
+function swTab(id,btn){
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('act'));
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('act'));
+  document.getElementById('tc-'+id).classList.add('act');
+  btn.classList.add('act');
+}
+
+function tick(){
+  const now=new Date();
+  document.getElementById('clk').textContent=mfmt(now,{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' CEST';
+  if(window._cdt){
+    let d=Math.max(0,window._cdt-now);
+    const dd=Math.floor(d/86400000);d-=dd*86400000;
+    const hh=Math.floor(d/3600000);d-=hh*3600000;
+    const mm=Math.floor(d/60000);d-=mm*60000;
+    const ss=Math.floor(d/1000);
+    document.getElementById('cdd').textContent=pad(dd);
+    document.getElementById('cdh').textContent=pad(hh);
+    document.getElementById('cdm').textContent=pad(mm);
+    document.getElementById('cds').textContent=pad(ss);
+  }
+}
+
+async function loadData(silent){
+  const PROXIES=[
+    'https://corsproxy.io/?url=',
+    'https://api.allorigins.win/raw?url=',
+    '',
+  ];
+  let ok=false;
+  for(const proxy of PROXIES){
+    try{
+      const u1=proxy?proxy+encodeURIComponent(API_BASE+'/competitions/WC/matches'):API_BASE+'/competitions/WC/matches';
+      const u2=proxy?proxy+encodeURIComponent(API_BASE+'/competitions/WC/standings'):API_BASE+'/competitions/WC/standings';
+      const [mr,sr]=await Promise.all([
+        fetch(u1,{headers:{'X-Auth-Token':API_KEY},signal:AbortSignal.timeout(8000)}),
+        fetch(u2,{headers:{'X-Auth-Token':API_KEY},signal:AbortSignal.timeout(8000)}).catch(()=>null)
+      ]);
+      if(!mr.ok) throw new Error(mr.status);
+      const md=await mr.json();
+      if(md.matches?.length){
+        apiMatches=md.matches;
+        if(sr?.ok){
+          const sd=await sr.json();
+          apiStandings={};
+          (sd.standings||[]).forEach(g=>{apiStandings[g.group||g.stage]=g.table||[];});
+        }
+        document.getElementById('abadge').textContent='⬤ API en vivo';
+        document.getElementById('abadge').className='apib api-ok';
+        ok=true;
+        break;
+      }
+    }catch(e){ console.warn('Proxy failed:',proxy,e.message); }
+  }
+  if(!ok){
+    apiMatches=null; apiStandings=null;
+    document.getElementById('abadge').textContent='⬤ Datos estáticos';
+    document.getElementById('abadge').className='apib api-no';
+  }
+  document.getElementById('lupd').textContent=mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
+  renderAll();
+}
+
 
 
 // Flag codes by country name
@@ -1027,3 +1138,13 @@ function renderBracket(){
     '</div>';
 }
 
+// ═══ INIT — al final para que todas las declaraciones existan ═══
+window._cdt = new Date('2026-07-03T21:00:00Z');
+renderAll();
+document.getElementById('lupd').textContent = mfmt(new Date(),{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' CEST';
+setTimeout(()=>loadData(true), 500);
+setInterval(tick, 1000); tick();
+setInterval(()=>loadData(true), 3*60*1000);
+</script>
+</body>
+</html>
